@@ -1,0 +1,54 @@
+.page { padding-block: var(--space-7) var(--space-8); display: flex; flex-direction: column; gap: var(--space-6); }
+
+.head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--space-4); flex-wrap: wrap;
+  padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border);
+}
+.eyebrow {
+  font-family: var(--font-heading); font-weight: 600; font-size: var(--text-xs);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent-text);
+  margin-bottom: var(--space-1);
+}
+.title { font-size: var(--text-2xl); }
+.headActions { display: flex; align-items: center; gap: var(--space-4); }
+.headLink { font-family: var(--font-heading); font-weight: 600; text-decoration: none; font-size: var(--text-base); }
+.headLink:hover { text-decoration: underline; }
+.signOut {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--font-heading); font-weight: 600; font-size: var(--text-base);
+  color: var(--color-text-subtle); text-decoration: underline;
+}
+.signOut:hover { color: var(--color-danger); }
+
+.section { display: flex; flex-direction: column; gap: var(--space-4); }
+.sectionTitle { font-size: var(--text-lg); }
+
+.regList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+
+.regRow {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-5); flex-wrap: wrap;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+}
+.regRow:hover { border-color: var(--color-accent); }
+
+.regMain { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; flex: 1; }
+.regHead { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+.reference {
+  font-family: var(--font-mono); font-size: var(--text-xs); color: var(--color-text-subtle);
+}
+.regTitle { font-size: var(--text-md); }
+.regTitle a { color: var(--color-text); text-decoration: none; }
+.regTitle a:hover { color: var(--color-accent-text); text-decoration: underline; }
+.regMeta { font-size: var(--text-sm); color: var(--color-text-subtle); }
+.regUrgent { font-size: var(--text-sm); color: var(--color-warning); font-weight: 600; }
+
+.regAction { flex-shrink: 0; }
+.regLink { font-family: var(--font-heading); font-weight: 600; text-decoration: none; font-size: var(--text-base); }
+.regLink:hover { text-decoration: underline; }
+
+.pending { color: var(--color-text-subtle); font-size: var(--text-base); }

@@ -214,6 +214,6 @@ export interface SessionUser {
   status: string;
   isStaff?: boolean;
   emailVerified?: boolean;
-  roles?: string[];
+  roles?: { key: string; name: string }[];
   permissions?: string[];
 }
