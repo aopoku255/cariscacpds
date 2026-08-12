@@ -19,25 +19,16 @@
 }
 
 .brand { text-decoration: none; display: block; }
-.brand:hover .brandMark { color: var(--color-accent-hover); }
 
-.brandMark {
+/* 13.4:1 lockup — tall enough to read the descriptor, short enough for the bar. */
+.logo {
   display: block;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: var(--text-xl);
-  letter-spacing: 0.04em;
-  color: var(--color-accent-text);
-  line-height: 1.1;
+  height: 34px;
+  width: auto;
+  max-width: 100%;
+  transition: opacity 120ms ease;
 }
-
-.brandTag {
-  display: block;
-  font-size: var(--text-xs);
-  color: var(--color-text-subtle);
-  letter-spacing: 0.01em;
-}
-
+.brand:hover 
 .nav {
   display: flex;
   align-items: center;
@@ -71,11 +62,22 @@
   flex-wrap: wrap;
 }
 
-.footerName {
+/* The artwork is black; reversed out to sit on the navy footer. A monochrome
+   mark inverts cleanly, so no second asset is needed. */
+.footerLogo {
+  display: block;
+  height: 30px;
+  width: auto;
+  max-width: 100%;
+  filter: brightness(0) invert(1);
+  margin-bottom: var(--space-3);
+}
+
+.footerTagline {
   font-family: var(--font-heading);
   font-weight: 600;
   color: #fff;
-  max-width: 40ch;
+  font-size: var(--text-base);
   margin-bottom: var(--space-2);
 }
 
@@ -89,6 +91,20 @@
 }
 .footerLinks a { color: #dbe4f5; text-decoration: none; }
 .footerLinks a:hover { color: #fff; text-decoration: underline; }
+
+@media (max-width: 820px) {
+  /*
+    Cropped to the wordmark rather than scaled whole: the full lockup at this
+    width puts the descriptor at roughly five pixels tall. 4.6:1 is where
+    "CARISCA" ends in the artwork.
+  */
+  .logo {
+    height: 30px;
+    width: 138px;
+    object-fit: cover;
+    object-position: left center;
+  }
+}
 
 @media (max-width: 640px) {
   .headerInner { justify-content: center; text-align: center; }

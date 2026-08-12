@@ -51,8 +51,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className={styles.header}>
           <div className={`shell ${styles.headerInner}`}>
             <Link href="/" className={styles.brand}>
-              <span className={styles.brandMark}>CARISCA</span>
-              <span className={styles.brandTag}>Strong Supply Chains — Strong Communities</span>
+              {/*
+                The official lockup. On narrow screens it is cropped to the
+                CARISCA wordmark rather than scaled whole — at phone width the
+                descriptor line would be about five pixels tall and unreadable.
+                eslint-disable-next-line @next/next/no-img-element
+              */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/carisca-logo.png"
+                alt="CARISCA — Centre for Applied Research and Innovation in Supply Chain-Africa"
+                className={styles.logo}
+                width={2123}
+                height={159}
+              />
             </Link>
 
             <nav className={styles.nav} aria-label="Main">
@@ -79,9 +91,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <footer className={styles.footer}>
           <div className={`shell ${styles.footerInner}`}>
             <div>
-              <p className={styles.footerName}>
-                Centre for Applied Research and Innovation in Supply Chain&#8209;Africa
-              </p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/carisca-logo.png"
+                alt="CARISCA — Centre for Applied Research and Innovation in Supply Chain-Africa"
+                className={styles.footerLogo}
+                width={2123}
+                height={159}
+              />
+              <p className={styles.footerTagline}>Strong Supply Chains — Strong Communities</p>
               <p className={styles.footerMeta}>
                 KNUST School of Business, College of Humanities &amp; Social Sciences<br />
                 PMB, Kumasi, Ghana
