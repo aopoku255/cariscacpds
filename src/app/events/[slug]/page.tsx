@@ -43,6 +43,16 @@ const AUDIENCE_LABEL: Record<EventPrice['audience'], string> = {
   INTERNATIONAL: 'Participants outside Africa',
 };
 
+/** Participant-facing wording; the enum is for the database. */
+const PARTNER_ROLE: Record<NonNullable<PublicEvent['partners']>[number]['role'], string> = {
+  PARTNER: 'Partner',
+  HOST: 'Host',
+  SPONSOR: 'Sponsor',
+  FUNDER: 'Funder',
+  ACCREDITOR: 'Accredited by',
+  SUPPORTER: 'Supporter',
+};
+
 const MODE_LABEL: Record<EventPrice['attendanceMode'], string> = {
   ANY: 'Any',
   IN_PERSON: 'In person',
@@ -289,6 +299,39 @@ export default async function EventPage({ params }: { params: Params }) {
               </ul>
             </section>
           ) : null}
+
+          {event.partners && event.partners.length > 0 && (
+            <section className={styles.section}>
+              <h2>In partnership with</h2>
+              <ul className={styles.partners}>
+                {event.partners.map((partner) => {
+                  const logo = assetUrl(partner.logo?.url);
+                  const inner = (
+                    <>
+                      {logo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={logo} alt={partner.name} className={styles.partnerLogo} loading="lazy" />
+                      ) : (
+                        <span className={styles.partnerName}>{partner.name}</span>
+                      )}
+                      <span className={styles.partnerRole}>{PARTNER_ROLE[partner.role]}</span>
+                    </>
+                  );
+
+                  return (
+                    <li key={partner.id} className={styles.partner}>
+                      {partner.websiteUrl ? (
+                        <a href={partner.websiteUrl} target="_blank" rel="noreferrer noopener"
+                          className={styles.partnerLink} title={partner.name}>
+                          {inner}
+                        </a>
+                      ) : inner}
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
 
           {event.cpd?.requirements && (
             <section className={styles.section}>

@@ -136,6 +136,14 @@ export interface PublicEvent {
     rule: 'NONE' | 'CHECK_IN' | 'SESSION_PERCENT';
     minPercent: number | null;
   };
+  partners?: {
+    id: string;
+    name: string;
+    shortName: string | null;
+    websiteUrl: string | null;
+    logo: { id: string; url: string; mimeType: string } | null;
+    role: 'PARTNER' | 'SPONSOR' | 'HOST' | 'FUNDER' | 'ACCREDITOR' | 'SUPPORTER';
+  }[];
   prices?: EventPrice[];
   questions?: RegistrationQuestion[];
   sessions?: EventSession[];
