@@ -58,7 +58,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <nav className={styles.nav} aria-label="Main">
               <Link href="/events">Events</Link>
               <Link href="/verify">Verify a certificate</Link>
-              {user?.isStaff && <Link href="/admin" className={styles.navStaff}>Admin</Link>}
+              {/* The console is a separate application; link out to it. */}
+              {user?.isStaff && (
+                <a
+                  href={process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:3001'}
+                  className={styles.navStaff}
+                >
+                  Admin
+                </a>
+              )}
               <Link href="/dashboard" className={styles.navCta}>
                 {user ? 'My account' : 'Sign in'}
               </Link>
