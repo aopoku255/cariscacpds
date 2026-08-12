@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Barlow, Arimo } from 'next/font/google';
 import Link from 'next/link';
+import { getSession } from '@/lib/auth/session';
 import '@/styles/globals.css';
 import styles from './layout.module.css';
 
@@ -37,7 +38,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Staff need a way to reach the console. Without this the only route in is
+  // typing /admin, which nobody discovers.
+  const user = await getSession().catch(() => null);
+
   return (
     <html lang="en" className={`${barlow.variable} ${arimo.variable}`}>
       <body>
@@ -53,7 +58,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <nav className={styles.nav} aria-label="Main">
               <Link href="/events">Events</Link>
               <Link href="/verify">Verify a certificate</Link>
-              <Link href="/dashboard" className={styles.navCta}>My account</Link>
+              {user?.isStaff && <Link href="/admin" className={styles.navStaff}>Admin</Link>}
+              <Link href="/dashboard" className={styles.navCta}>
+                {user ? 'My account' : 'Sign in'}
+              </Link>
             </nav>
           </div>
         </header>

@@ -94,3 +94,14 @@
   .headerInner { justify-content: center; text-align: center; }
   .nav { gap: var(--space-4); font-size: var(--text-sm); }
 }
+
+/* Staff-only shortcut into the console. Marked out from the public links so
+   it is obviously a different surface, using the brand cyan as a rule. */
+.navStaff {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--color-accent-wash);
+  color: var(--color-accent-text) !important;
+  box-shadow: inset 0 -2px 0 var(--color-highlight);
+}
+.navStaff:hover { background: #d5e1f5; }
