@@ -1,0 +1,58 @@
+.hero {
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
+  border-bottom: 1px solid var(--color-border);
+  padding-block: var(--space-9) var(--space-8);
+}
+.heroInner { max-width: 62ch; display: flex; flex-direction: column; gap: var(--space-4); }
+
+.eyebrow {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+}
+
+.title { font-size: var(--text-4xl); }
+.lede { font-size: var(--text-lg); color: var(--color-text-muted); }
+.actions { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-3); }
+
+.upcoming { padding-block: var(--space-8); }
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+.sectionHead h2 { font-size: var(--text-2xl); }
+.seeAll { font-family: var(--font-heading); font-weight: 600; text-decoration: none; font-size: var(--text-base); }
+.seeAll:hover { text-decoration: underline; }
+
+.grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: var(--space-5);
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+}
+.none { color: var(--color-text-subtle); }
+
+.strands { padding-block: var(--space-6) var(--space-8); }
+.strandsTitle { font-size: var(--text-2xl); margin-bottom: var(--space-5); }
+.strandList {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: var(--space-5);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.strandList li {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+.strandList h3 { font-size: var(--text-md); margin-bottom: var(--space-2); }
+.strandList p { color: var(--color-text-subtle); font-size: var(--text-base); }
