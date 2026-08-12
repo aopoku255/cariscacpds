@@ -31,9 +31,10 @@ export default async function HomePage() {
               Build supply chain capability that lasts
             </h1>
             <p className={styles.lede}>
-              CARISCA runs continuing professional development, an annual summit and a
-              business forum for practitioners, researchers and students — at KNUST in
-              Kumasi and online across the continent.
+              CARISCA’s key objective is to support higher education institutions in
+              building the capacity necessary to provide best-in-class degree programs and
+              training, facilitate research translation and utilization, and engage
+              stakeholders in best practices and policy changes that strengthen supply chains.
             </p>
             <div className={styles.actions}>
               <ButtonLink href="/events" size="lg">Browse events</ButtonLink>
@@ -62,7 +63,7 @@ export default async function HomePage() {
         ) : (
           <p className={styles.none}>
             No events are scheduled at the moment. New programmes are announced
-            regularly — <Link href="/events?when=past">see what we have run before</Link>.
+            regularly. <Link href="/events?when=past">See what we have run before</Link>.
           </p>
         )}
       </section>

@@ -31,7 +31,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Sea
         <header className={styles.head}>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.lede}>
-            One account covers every CARISCA programme — CPD courses, the Summit and
+            One account covers every CARISCA programme: CPD courses, the Summit and
             the Business Forum.
           </p>
         </header>

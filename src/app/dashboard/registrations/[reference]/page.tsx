@@ -49,7 +49,7 @@ export default async function RegistrationPage({
 
         {isNew && registration.status === 'CONFIRMED' && (
           <Callout tone="success" title="You are registered">
-            We have emailed your confirmation. Your QR code is below — bring it with you.
+            We have emailed your confirmation. Your QR code is below. Bring it with you.
           </Callout>
         )}
 
@@ -78,7 +78,7 @@ export default async function RegistrationPage({
             {expired ? (
               <p className={styles.payText}>
                 We did not receive payment in time, so your place may have been released.
-                Try registering again — if places remain you can still join.
+                Try registering again. If places remain you can still join.
               </p>
             ) : (
               <>
@@ -99,7 +99,7 @@ export default async function RegistrationPage({
             */}
             <Callout tone="warning" title="Online payment is not switched on yet">
               Card and mobile money payment goes live shortly. In the meantime the
-              CARISCA team will contact you with payment instructions — or email{' '}
+              CARISCA team will contact you with payment instructions, or email{' '}
               <a href="mailto:info@carisca.knust.edu.gh">info@carisca.knust.edu.gh</a>.
             </Callout>
           </Card>

@@ -98,7 +98,7 @@ export async function registerForEventAction(
 
       return { ok: false, code: err.code, message: known[err.code] ?? err.message };
     }
-    return { ok: false, message: 'We could not reach the server. Nothing has been registered — please try again.' };
+    return { ok: false, message: 'We could not reach the server. Nothing has been registered. Please try again.' };
   }
 
   revalidatePath('/dashboard');

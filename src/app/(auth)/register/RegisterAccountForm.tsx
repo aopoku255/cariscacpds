@@ -60,7 +60,7 @@ export function RegisterAccountForm({
           autoComplete="new-password" minLength={10} required />
       </Field>
 
-      <Field label="Organization" htmlFor="organization" hint="Optional — you can add this later.">
+      <Field label="Organization" htmlFor="organization" hint="Optional. You can add this later.">
         <input id="organization" name="organization" className={inputClass}
           autoComplete="organization" />
       </Field>

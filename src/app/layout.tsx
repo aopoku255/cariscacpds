@@ -21,7 +21,7 @@ const arimo = Arimo({
 
 export const metadata: Metadata = {
   title: {
-    default: 'CARISCA — Events & Professional Development',
+    default: 'CARISCA: Events and Professional Development',
     template: '%s · CARISCA',
   },
   description:
@@ -58,7 +58,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/carisca-logo.png"
-                alt="CARISCA — Centre for Applied Research and Innovation in Supply Chain-Africa"
+                alt="CARISCA, Centre for Applied Research and Innovation in Supply Chain-Africa"
                 className={styles.logo}
                 width={2123}
                 height={159}
@@ -105,7 +105,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 height={159}
                 loading="lazy"
               />
-              <p className={styles.footerTagline}>Strong Supply Chains — Strong Communities</p>
+              <p className={styles.footerTagline}>Strong Supply Chains. Strong Communities.</p>
               <address className={styles.footerMeta}>
                 KNUST School of Business<br />
                 College of Humanities &amp; Social Sciences<br />

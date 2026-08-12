@@ -104,7 +104,7 @@ function FeeTable({ prices }: { prices: EventPrice[] }) {
         </div>
       ))}
       <p className={styles.feeNote}>
-        The exact fee for you is confirmed before you pay — it depends on how you attend
+        The exact fee for you is confirmed before you pay. It depends on how you attend
         and where you are based.
       </p>
     </div>
@@ -204,7 +204,7 @@ export default async function EventPage({ params }: { params: Params }) {
 
               {!cancelled && isOpen && everythingFull && (
                 <Callout tone="warning" title="This event is fully booked">
-                  You can still join the waitlist — we will email you if a place opens up.
+                  You can still join the waitlist and we will email you if a place opens up.
                   {' '}
                   <Link href={`/events/${event.slug}/register`}>Join the waitlist</Link>.
                 </Callout>
@@ -214,7 +214,7 @@ export default async function EventPage({ params }: { params: Params }) {
                 <Callout tone="info" title="Registration is not open yet">
                   {event.registrationOpensAt
                     ? `Registration opens on ${eventDateRange(event.registrationOpensAt, event.registrationOpensAt, event.timezone)}.`
-                    : 'Check back shortly — registration opens soon.'}
+                    : 'Check back shortly. Registration opens soon.'}
                 </Callout>
               )}
 

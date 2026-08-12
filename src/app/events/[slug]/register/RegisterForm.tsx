@@ -98,7 +98,7 @@ export function RegisterForm({
           )}
           {quote.isFull && quote.waitlistAvailable && (
             <p className={styles.quoteNote}>
-              This option is full — you will be added to the waitlist and emailed if
+              This option is full. You will be added to the waitlist and emailed if
               a place opens up. No payment is taken for a waitlist place.
             </p>
           )}
@@ -113,7 +113,7 @@ export function RegisterForm({
           <Link href={`/dashboard/profile?next=/events/${event.slug}/register`}>
             Update your details
           </Link>{' '}
-          if anything is wrong — they appear on your certificate.
+          if anything is wrong, as they appear on your certificate.
         </p>
 
         <dl className={styles.summary}>
