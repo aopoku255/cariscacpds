@@ -169,6 +169,14 @@ export interface Registration {
     onlineUrl: string | null;
   };
   answers?: { questionId: string; label: string | null; type: QuestionType | null; value: string }[];
+  /** Present only on admin listings — the serialiser omits it otherwise. */
+  participant?: {
+    id: string;
+    name: string;
+    email: string;
+    organization: string | null;
+    countryCode: string | null;
+  };
 }
 
 export interface Quote {
