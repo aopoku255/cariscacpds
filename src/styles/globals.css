@@ -16,7 +16,8 @@ body {
 
 h1, h2, h3, h4, h5 {
   font-family: var(--font-heading);
-  font-weight: 600;
+  /* One family throughout, so weight carries the hierarchy. */
+  font-weight: 700;
   line-height: 1.2;
   margin: 0;
   text-wrap: balance;

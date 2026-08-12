@@ -1,7 +1,8 @@
+/* --- header ---------------------------------------------------------------- */
 .header {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  /* The cyan is a rule, never text — it fails contrast at 1.9:1 on white. */
+  /* The brand cyan as a rule, never as text — it measures 1.9:1 on white. */
   box-shadow: inset 0 -3px 0 var(--color-highlight);
   position: sticky;
   top: 0;
@@ -13,14 +14,16 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
-  min-height: 68px;
-  flex-wrap: wrap;
-  padding-block: var(--space-2);
+  min-height: 72px;
+  padding-block: var(--space-3);
+  /* Anchors the mobile menu panel, which is absolutely positioned. */
+  position: relative;
 }
 
-.brand { text-decoration: none; display: block; }
+.brand { text-decoration: none; display: block; flex-shrink: 0; }
+.brand:hover .logo { opacity: 0.75; }
 
-/* 13.4:1 lockup — tall enough to read the descriptor, short enough for the bar. */
+/* A 13.4:1 lockup — tall enough to read the descriptor, short enough for a bar. */
 .logo {
   display: block;
   height: 34px;
@@ -28,42 +31,56 @@
   max-width: 100%;
   transition: opacity 120ms ease;
 }
-.brand:hover 
-.nav {
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-  font-family: var(--font-heading);
+
+/* --- institutions band ------------------------------------------------------ */
+.institutions {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  padding-block: var(--space-7);
+  text-align: center;
+}
+
+.institutionsHeading {
+  font-size: var(--text-xs);
   font-weight: 600;
-  font-size: var(--text-base);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-subtle);
+  margin-bottom: var(--space-5);
 }
-.nav a { text-decoration: none; color: var(--color-text-muted); }
-.nav a:hover { color: var(--color-accent-text); }
 
-.navCta {
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-accent);
-  border-radius: var(--radius);
-  color: var(--color-accent-text) !important;
+/*
+  Contained, never cropped, and left on a light ground: these are other
+  institutions' marks and are not ours to recolour.
+*/
+.trilogo {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+  margin-inline: auto;
 }
-.navCta:hover { background: var(--color-accent-wash); }
 
+/* --- footer ------------------------------------------------------------------ */
 .footer {
-  margin-top: var(--space-9);
   background: var(--carisca-navy);
   color: #dbe4f5;
-  padding-block: var(--space-7);
+  padding-block: var(--space-7) var(--space-4);
 }
 
 .footerInner {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--space-6);
-  flex-wrap: wrap;
+  align-items: start;
 }
 
-/* The artwork is black; reversed out to sit on the navy footer. A monochrome
-   mark inverts cleanly, so no second asset is needed. */
+.footerBrand { display: flex; flex-direction: column; }
+
+/*
+  The mark is black on transparency, so it reverses cleanly to white and needs
+  no second asset. Decorative here — the address beneath already names us.
+*/
 .footerLogo {
   display: block;
   height: 30px;
@@ -74,14 +91,18 @@
 }
 
 .footerTagline {
-  font-family: var(--font-heading);
   font-weight: 600;
   color: #fff;
   font-size: var(--text-base);
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
-.footerMeta { font-size: var(--text-sm); color: #b3c3e0; }
+.footerMeta {
+  font-size: var(--text-sm);
+  color: #b3c3e0;
+  font-style: normal;
+  line-height: 1.7;
+}
 
 .footerLinks {
   display: flex;
@@ -92,32 +113,45 @@
 .footerLinks a { color: #dbe4f5; text-decoration: none; }
 .footerLinks a:hover { color: #fff; text-decoration: underline; }
 
+.footerHeading {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #93a9d4;
+  margin-bottom: var(--space-1);
+}
+
+.footerBottom {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgb(255 255 255 / 12%);
+  font-size: var(--text-sm);
+  color: #93a9d4;
+}
+
+/* --- responsive --------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .footerInner { grid-template-columns: 1fr 1fr; }
+  .footerBrand { grid-column: 1 / -1; }
+}
+
 @media (max-width: 820px) {
   /*
-    Cropped to the wordmark rather than scaled whole: the full lockup at this
-    width puts the descriptor at roughly five pixels tall. 4.6:1 is where
+    Cropped to the wordmark rather than scaled whole: the full lockup at phone
+    width puts the descriptor line around five pixels tall. 4.6:1 is where
     "CARISCA" ends in the artwork.
   */
   .logo {
-    height: 30px;
-    width: 138px;
+    height: 28px;
+    width: 130px;
     object-fit: cover;
     object-position: left center;
   }
+  .headerInner { min-height: 64px; gap: var(--space-3); }
 }
 
-@media (max-width: 640px) {
-  .headerInner { justify-content: center; text-align: center; }
-  .nav { gap: var(--space-4); font-size: var(--text-sm); }
+@media (max-width: 560px) {
+  .footerInner { grid-template-columns: 1fr; gap: var(--space-5); }
+  .institutions { padding-block: var(--space-6); }
 }
-
-/* Staff-only shortcut into the console. Marked out from the public links so
-   it is obviously a different surface, using the brand cyan as a rule. */
-.navStaff {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius);
-  background: var(--color-accent-wash);
-  color: var(--color-accent-text) !important;
-  box-shadow: inset 0 -2px 0 var(--color-highlight);
-}
-.navStaff:hover { background: #d5e1f5; }
