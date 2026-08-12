@@ -75,6 +75,11 @@ export default async function AdminEventPage({
           {can(user, 'cpd.update') && (
             <ButtonLink href={`/admin/cpd/${event.id}/edit`} variant="secondary">Edit details</ButtonLink>
           )}
+          {can(user, 'attendance.view') && (
+            <ButtonLink href={`/admin/cpd/${event.id}/attendance`} variant="secondary">
+              Attendance
+            </ButtonLink>
+          )}
           {can(user, 'cpd.registration.view') && (
             <ButtonLink href={`/admin/registrations?eventId=${event.id}`}>
               Registrations{summary ? ` (${summary.totals.all})` : ''}
