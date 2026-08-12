@@ -34,6 +34,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const user = await getSession().catch(() => null);
 
   const links: NavLink[] = [
+    { href: '/about', label: 'About' },
     { href: '/events', label: 'Events' },
     { href: '/verify', label: 'Verify a certificate' },
     ...(user?.isStaff
@@ -114,6 +115,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             <nav className={styles.footerLinks} aria-label="Footer">
               <h2 className={styles.footerHeading}>Explore</h2>
+              <Link href="/about">About CARISCA</Link>
               <Link href="/events">Events</Link>
               <Link href="/events?when=past">Past events</Link>
               <Link href="/verify">Verify a certificate</Link>
