@@ -7,6 +7,7 @@ import { Badge, Callout, ButtonLink, Card } from '@/components/ui';
 import {
   eventDateRange, eventTime, timezoneLabel, deliveryLabel, money, eventStatusLabel,
 } from '@/lib/format';
+import { assetUrl } from '@/lib/api/assets';
 import styles from './event.module.css';
 
 export const revalidate = 60;
@@ -29,6 +30,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       title: event.title,
       description: event.shortDescription ?? undefined,
       type: 'article',
+      // So a link shared on WhatsApp or LinkedIn previews with the banner.
+      images: event.banner ? [assetUrl(event.banner.url)!] : undefined,
     },
   };
 }
@@ -112,8 +115,17 @@ export default async function EventPage({ params }: { params: Params }) {
     || (event.deliveryMode === 'ONLINE' && virtualFull)
     || (event.deliveryMode === 'HYBRID' && inPersonFull && virtualFull);
 
+  const banner = assetUrl(event.banner?.url);
+
   return (
     <article>
+      {banner && (
+        <div className={styles.bannerWrap}>
+          {/* Decorative: the title immediately below carries the meaning. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={banner} alt="" className={styles.bannerImage} />
+        </div>
+      )}
       <header className={styles.hero}>
         <div className="shell">
           <div className={styles.heroInner}>

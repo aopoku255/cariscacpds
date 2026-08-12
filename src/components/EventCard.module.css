@@ -54,3 +54,12 @@
   text-decoration: none;
 }
 .more:hover { text-decoration: underline; }
+
+.bannerLink { display: block; margin: calc(var(--space-5) * -1) calc(var(--space-5) * -1) 0; }
+.banner {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--color-surface-sunken);
+}

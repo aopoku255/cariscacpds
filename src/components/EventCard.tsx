@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { PublicEvent } from '@/lib/api/types';
 import { Badge } from '@/components/ui';
+import { assetUrl } from '@/lib/api/assets';
 import {
   eventDateRange, deliveryLabel, money, eventStatusLabel,
 } from '@/lib/format';
@@ -26,8 +27,17 @@ export function EventCard({ event }: { event: PublicEvent }) {
     && event.availability.inPerson?.isFull !== false
     && event.availability.virtual?.isFull !== false;
 
+  const banner = assetUrl(event.banner?.url);
+
   return (
     <article className={styles.card}>
+      {banner && (
+        <Link href={`/events/${event.slug}`} className={styles.bannerLink} tabIndex={-1} aria-hidden="true">
+          {/* Decorative here: the title link beside it already names the event. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={banner} alt="" className={styles.banner} loading="lazy" />
+        </Link>
+      )}
       <div className={styles.head}>
         {event.type && <Badge tone="accent">{event.type.name}</Badge>}
         {isOpen && !bothFull && <Badge tone="success">Open</Badge>}

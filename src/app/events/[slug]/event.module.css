@@ -129,3 +129,11 @@
   padding-top: var(--space-3);
   border-top: 1px solid var(--color-border);
 }
+
+.bannerWrap { background: var(--color-surface-sunken); }
+.bannerImage {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  display: block;
+}
