@@ -216,6 +216,18 @@ export interface ReferenceData {
   suffixes: string[];
 }
 
+/**
+ * The fuller record /users/me returns. /auth/me omits the vocabulary joins, so
+ * the profile form reads this rather than the session user — otherwise the
+ * position and sector selects would come back empty on every load.
+ */
+export interface UserProfile extends SessionUser {
+  timezone: string | null;
+  position?: { key: string; label: string };
+  sector?: { key: string; label: string };
+  country?: { code: string; name: string; region: string | null };
+}
+
 export interface SessionUser {
   id: string;
   email: string;
