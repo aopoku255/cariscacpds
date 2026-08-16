@@ -1,0 +1,36 @@
+/*
+  Sits exactly on the header's 3px cyan rule (the `inset 0 -3px 0` shadow on
+  .header), so the bar reads as that rule filling in rather than as a second
+  band of chrome appearing. A child paints above its parent's box-shadow, so no
+  z-index juggling is needed.
+*/
+.track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  overflow: hidden;
+  /* Purely an indicator — it must never eat a click meant for the header. */
+  pointer-events: none;
+}
+
+.bar {
+  height: 100%;
+  background: var(--color-accent);
+  /* Rounded only at the leading edge; the tail stays flush with the viewport. */
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  /* Slightly longer than the creep interval, so growth reads as continuous
+     motion rather than a series of steps. */
+  transition: width 220ms ease-out, opacity 180ms ease-out;
+  box-shadow: 0 0 8px rgb(15 59 143 / 45%);
+}
+
+/* The finish: snap to full, then fade rather than shrink. */
+.done {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar { transition: none; }
+}

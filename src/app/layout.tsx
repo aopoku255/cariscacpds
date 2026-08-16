@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { Arimo } from 'next/font/google';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth/session';
 import { SiteNav, type NavLink } from '@/components/SiteNav';
+import { RouteProgress } from '@/components/RouteProgress';
 import '@/styles/globals.css';
 import styles from './layout.module.css';
 
@@ -63,6 +65,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
             <SiteNav links={links} />
           </div>
+
+          {/*
+            Inside the header so it anchors to it — .header is sticky, which
+            makes it the containing block for an absolutely positioned child.
+            Suspense because RouteProgress reads useSearchParams: without a
+            boundary that would opt every page out of static rendering.
+          */}
+          <Suspense fallback={null}>
+            <RouteProgress />
+          </Suspense>
         </header>
 
         <main id="main">{children}</main>
