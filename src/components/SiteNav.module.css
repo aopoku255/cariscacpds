@@ -96,7 +96,16 @@
 @media (max-width: 820px) {
   .desktop { display: none; }
   .toggle { display: inline-flex; }
-  .panel { display: block; }
+
+  /*
+    Scoped to :not([hidden]) deliberately. The panel is closed by React setting
+    the `hidden` attribute, whose `display: none` comes from the user-agent
+    stylesheet — and any author `display` declaration outranks it. A plain
+    `.panel { display: block }` here therefore pinned the menu open on phones
+    and left the toggle apparently dead: it flipped the attribute, and nothing
+    on screen changed.
+  */
+  .panel:not([hidden]) { display: block; }
 }
 
 @media (prefers-reduced-motion: reduce) {
