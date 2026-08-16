@@ -33,17 +33,13 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getSession().catch(() => null);
 
+  // Certificate verification and the admin console are deliberately absent.
+  // Verification is reached from the link printed on a certificate, by the
+  // people who hold one; the console has its own address that staff know.
+  // Neither belongs in a public nav aimed at people looking for events.
   const links: NavLink[] = [
     { href: '/about', label: 'About' },
     { href: '/events', label: 'Events' },
-    { href: '/verify', label: 'Verify a certificate' },
-    ...(user?.isStaff
-      ? [{
-        href: process.env.NEXT_PUBLIC_ADMIN_URL ?? 'http://localhost:3001',
-        label: 'Admin',
-        external: true,
-      }]
-      : []),
     { href: '/dashboard', label: user ? 'My account' : 'Sign in', emphasis: true },
   ];
 
@@ -118,7 +114,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/about">About CARISCA</Link>
               <Link href="/events">Events</Link>
               <Link href="/events?when=past">Past events</Link>
-              <Link href="/verify">Verify a certificate</Link>
               <Link href="/dashboard">My account</Link>
             </nav>
 

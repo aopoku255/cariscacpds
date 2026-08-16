@@ -38,8 +38,8 @@ export default async function HomePage() {
             </p>
             <div className={styles.actions}>
               <ButtonLink href="/events" size="lg">Browse events</ButtonLink>
-              <ButtonLink href="/verify" size="lg" variant="secondary">
-                Verify a certificate
+              <ButtonLink href="/about" size="lg" variant="secondary">
+                About CARISCA
               </ButtonLink>
             </div>
           </div>
