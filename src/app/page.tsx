@@ -3,6 +3,7 @@ import { apiRequest } from '@/lib/api/client';
 import type { PublicEvent } from '@/lib/api/types';
 import { EventCard } from '@/components/EventCard';
 import { ButtonLink } from '@/components/ui';
+import { Icon } from '@/components/ui/icons';
 import styles from './home.module.css';
 
 export const revalidate = 60;
@@ -37,8 +38,8 @@ export default async function HomePage() {
               stakeholders in best practices and policy changes that strengthen supply chains.
             </p>
             <div className={styles.actions}>
-              <ButtonLink href="/events" size="lg">Browse events</ButtonLink>
-              <ButtonLink href="/about" size="lg" variant="secondary">
+              <ButtonLink href="/events" size="lg" variant="onDark">Browse events</ButtonLink>
+              <ButtonLink href="/about" size="lg" variant="onDarkGhost">
                 About CARISCA
               </ButtonLink>
             </div>
@@ -50,7 +51,8 @@ export default async function HomePage() {
         <div className={styles.sectionHead}>
           <h2>Coming up</h2>
           <Link href="/events" className={styles.seeAll}>
-            All events<span aria-hidden="true"> →</span>
+            All events
+            <Icon name="arrowRight" className={styles.seeAllIcon} />
           </Link>
         </div>
 

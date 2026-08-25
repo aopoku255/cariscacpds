@@ -9,7 +9,12 @@ export function Badge({ tone = 'neutral', children }: { tone?: Tone; children: R
 }
 
 type ButtonProps = {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  /**
+   * `onDark` and `onDarkGhost` are for the navy grounds — the hero, and
+   * anything else placed on the brand colour. The ordinary primary is
+   * CARISCA blue, which all but disappears against navy.
+   */
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'onDark' | 'onDarkGhost';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   children: ReactNode;

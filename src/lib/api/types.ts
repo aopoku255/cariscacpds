@@ -94,6 +94,13 @@ export interface EventSpeaker {
   organization: string | null;
   bio: string | null;
   role: 'SPEAKER' | 'FACILITATOR' | 'MODERATOR' | 'PANELLIST';
+  photo: {
+    id: string;
+    url: string;
+    mimeType: string;
+    sizeBytes: number;
+    originalName: string;
+  } | null;
 }
 
 export interface CpdDetail {
@@ -173,6 +180,8 @@ export interface Registration {
   cancelledAt: string | null;
   cancellationReason: string | null;
   createdAt: string;
+  /** Whether this registration currently earns a certificate, and why not if it doesn't. */
+  certificate?: { eligible: true } | { eligible: false; code: string; reason: string };
   event?: {
     id: string;
     slug: string;

@@ -139,6 +139,7 @@ export default async function EventPage({ params }: { params: Params }) {
       <header className={styles.hero}>
         <div className="shell">
           <div className={styles.heroInner}>
+            <div className={styles.heroMain}>
             <div className={styles.badges}>
               {event.type && <Badge tone="accent">{event.type.name}</Badge>}
               {cancelled
@@ -151,7 +152,9 @@ export default async function EventPage({ params }: { params: Params }) {
 
             <h1 className={styles.title}>{event.title}</h1>
             {event.shortDescription && <p className={styles.lede}>{event.shortDescription}</p>}
+            </div>
 
+            <aside className={styles.heroAside}>
             <dl className={styles.facts}>
               <div>
                 <dt>Dates</dt>
@@ -224,6 +227,7 @@ export default async function EventPage({ params }: { params: Params }) {
                 </Callout>
               )}
             </div>
+            </aside>
           </div>
         </div>
       </header>
@@ -286,14 +290,21 @@ export default async function EventPage({ params }: { params: Params }) {
               <h2>Facilitators and speakers</h2>
               <ul className={styles.speakers}>
                 {event.speakers.map((s) => (
-                  <li key={s.id}>
-                    <h3 className={styles.speakerName}>{s.name}</h3>
-                    {(s.title || s.organization) && (
-                      <p className={styles.speakerRole}>
-                        {[s.title, s.organization].filter(Boolean).join(', ')}
-                      </p>
+                  <li key={s.id} className={styles.speakerCard}>
+                    {s.photo && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={assetUrl(s.photo.url) ?? undefined} alt=""
+                        className={styles.speakerPhoto} />
                     )}
-                    {s.bio && <p className={styles.speakerBio}>{s.bio}</p>}
+                    <div>
+                      <h3 className={styles.speakerName}>{s.name}</h3>
+                      {(s.title || s.organization) && (
+                        <p className={styles.speakerRole}>
+                          {[s.title, s.organization].filter(Boolean).join(', ')}
+                        </p>
+                      )}
+                      {s.bio && <p className={styles.speakerBio}>{s.bio}</p>}
+                    </div>
                   </li>
                 ))}
               </ul>

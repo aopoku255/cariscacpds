@@ -51,6 +51,24 @@
 .v-ghost { background: transparent; color: var(--color-text-muted); }
 .v-ghost:hover:not(:disabled) { background: var(--color-surface-sunken); color: var(--color-text); }
 
+/* --- on navy --------------------------------------------------------------
+ * White carries the call to action on a dark ground; the cyan is reserved for
+ * the hover, where it sits on a solid fill and never has to carry text.
+ */
+.v-onDark { background: #fff; color: var(--carisca-navy); }
+.v-onDark:hover:not(:disabled) { background: var(--carisca-cyan); color: #062045; }
+
+.v-onDarkGhost {
+  background: rgb(255 255 255 / 8%);
+  color: #fff;
+  border-color: rgb(255 255 255 / 40%);
+}
+.v-onDarkGhost:hover:not(:disabled) {
+  background: rgb(255 255 255 / 16%);
+  border-color: #fff;
+  color: #fff;
+}
+
 .v-danger { background: var(--color-danger); color: #fff; }
 .v-danger:hover:not(:disabled) { background: #a72e4f; color: #fff; }
 

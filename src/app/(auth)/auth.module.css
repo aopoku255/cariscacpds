@@ -6,8 +6,8 @@
   max-width: 460px;
   margin-inline: auto;
 }
-.head { display: flex; flex-direction: column; gap: var(--space-2); }
-.title { font-size: var(--text-2xl); }
+.head { display: flex; flex-direction: column; gap: var(--space-2); text-align: center; }
+.title { font-size: var(--text-2xl); letter-spacing: -0.01em; }
 .lede { color: var(--color-text-subtle); }
 
 .form {
@@ -18,6 +18,9 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-6);
+  /* Lifted off the page rather than outlined flat against it — this is the
+     one thing on the screen and should read as the thing to act on. */
+  box-shadow: var(--shadow-lg);
 }
 
 .pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }

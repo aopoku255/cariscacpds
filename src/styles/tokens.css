@@ -95,6 +95,22 @@
   --shell-narrow: 720px;
 
   --ring: 0 0 0 3px rgb(15 59 143 / 25%);
+
+  /* --- motion -----------------------------------------------------------
+   * Every transition on this site is decoration: nothing uses movement as
+   * the only signal that something changed, so zeroing the duration below
+   * removes the animation without removing the meaning.
+   */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur: 180ms;
+  --dur-slow: 300ms;
+
+  /* A warmer, deeper lift than --shadow for cards that rise on hover. */
+  --shadow-hover: 0 10px 30px -6px rgb(17 28 54 / 18%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; --dur-slow: 0ms; }
 }
 
 /**

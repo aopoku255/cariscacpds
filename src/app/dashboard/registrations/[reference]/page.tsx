@@ -5,6 +5,7 @@ import { getSession, apiAsUser } from '@/lib/auth/session';
 import { ApiError } from '@/lib/api/client';
 import type { Registration } from '@/lib/api/types';
 import { Badge, Card, Callout, ButtonLink } from '@/components/ui';
+import uiStyles from '@/components/ui/ui.module.css';
 import {
   eventDateRange, eventTime, timezoneLabel, money, relativeDeadline,
   registrationStatusLabel, registrationTone, attendanceLabel,
@@ -15,13 +16,13 @@ export const metadata: Metadata = { title: 'Your registration', robots: { index:
 export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ reference: string }>;
-type SearchParams = Promise<{ new?: string }>;
+type SearchParams = Promise<{ new?: string; certificateError?: string }>;
 
 export default async function RegistrationPage({
   params, searchParams,
 }: { params: Params; searchParams: SearchParams }) {
   const { reference } = await params;
-  const { new: isNew } = await searchParams;
+  const { new: isNew, certificateError } = await searchParams;
 
   const user = await getSession();
   if (!user) redirect(`/login?next=/dashboard/registrations/${reference}`);
@@ -139,6 +140,36 @@ export default async function RegistrationPage({
             <p className={styles.eventLink}>
               <Link href={`/events/${event.slug}`}>See the full programme</Link>
             </p>
+          </Card>
+        )}
+
+        {certificateError && (
+          <Callout tone="warning" title="Could not generate your certificate">
+            {certificateError}
+          </Callout>
+        )}
+
+        {registration.certificate?.eligible && (
+          <Card>
+            <h2 className={styles.cardTitle}>Your certificate</h2>
+            <p className={styles.subtle}>
+              Download it as a PDF for printing, or an image to share.
+            </p>
+            {/*
+              A plain anchor, not next/link: this URL is a Route Handler
+              that streams a file, not a page, and Next's client-side router
+              would otherwise try to soft-navigate to it as one.
+            */}
+            <div className={styles.footerActions}>
+              <a href={`/dashboard/registrations/${reference}/certificate?format=pdf`}
+                className={`${uiStyles.button} ${uiStyles['v-primary']} ${uiStyles['s-md']}`}>
+                Download PDF
+              </a>
+              <a href={`/dashboard/registrations/${reference}/certificate?format=png`}
+                className={`${uiStyles.button} ${uiStyles['v-secondary']} ${uiStyles['s-md']}`}>
+                Download image
+              </a>
+            </div>
           </Card>
         )}
 

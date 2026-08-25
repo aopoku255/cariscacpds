@@ -3,20 +3,42 @@
   border-bottom: 1px solid var(--color-border);
   padding-block: var(--space-7);
 }
-.heroInner { max-width: 74ch; display: flex; flex-direction: column; gap: var(--space-4); }
+
+/*
+ * Two columns on a wide screen: the pitch on the left, the practical details
+ * and the register button together on the right. Previously all of it ran
+ * down the left in a 74ch measure and the right half of the page was empty —
+ * and the one thing a visitor is here to do sat below the fold of facts.
+ */
+.heroInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: var(--space-7);
+  align-items: start;
+}
+.heroMain { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+
 .badges { display: flex; gap: var(--space-2); flex-wrap: wrap; }
-.title { font-size: var(--text-4xl); }
+.title { font-size: var(--text-4xl); letter-spacing: -0.015em; }
 .lede { font-size: var(--text-lg); color: var(--color-text-muted); }
 
-.facts {
-  display: grid;
-  gap: var(--space-3);
-  margin: 0;
-  padding: var(--space-4) 0;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
+/* The panel is sticky so the register button stays reachable while someone
+   reads down a long programme. */
+.heroAside {
+  position: sticky;
+  top: calc(72px + var(--space-4));
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
-.facts > div { display: grid; grid-template-columns: 120px 1fr; gap: var(--space-4); }
+
+.facts { display: grid; gap: var(--space-4); margin: 0; }
+.facts > div { display: grid; gap: var(--space-1); }
 .facts dt {
   font-family: var(--font-heading);
   font-weight: 600;
@@ -24,12 +46,17 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-text-subtle);
-  padding-top: 2px;
 }
 .facts dd { margin: 0; }
 .time { color: var(--color-text-subtle); }
 
-.cta { margin-top: var(--space-2); }
+.cta { display: grid; gap: var(--space-3); }
+.cta > a { justify-content: center; }
+
+@media (max-width: 960px) {
+  .heroInner { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
+  .heroAside { position: static; }
+}
 
 .body {
   display: grid;
@@ -77,6 +104,17 @@
 .agendaWhere { color: var(--color-text-subtle); font-size: var(--text-sm); margin-top: var(--space-1); }
 
 .speakers { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-5); }
+.speakerCard { display: flex; gap: var(--space-4); align-items: flex-start; }
+/* Square and small: a speaker photo is an ID shot, not a hero image, and
+   should never compete with the event banner above it. */
+.speakerPhoto {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--color-surface-sunken);
+}
 .speakerName { font-size: var(--text-md); }
 .speakerRole { color: var(--color-accent-text); font-size: var(--text-sm); font-weight: 600; }
 .speakerBio { color: var(--color-text-subtle); margin-top: var(--space-2); }
