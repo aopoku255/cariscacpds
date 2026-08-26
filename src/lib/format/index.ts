@@ -1,6 +1,17 @@
 import type { Money, DeliveryMode, AttendanceMode, EventStatus, RegistrationStatus } from '../api/types';
 
 /**
+ * When something happened to a record — submitted, decided — rather than
+ * when an event itself takes place. Unlike eventDate, this is never tied to
+ * a specific timezone: a submission timestamp isn't the event's own start
+ * time, so there is no "wrong" zone to get it in.
+ */
+export function timestamp(iso: string | null | undefined) {
+  if (!iso) return '-';
+  return new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso));
+}
+
+/**
  * Dates are always formatted in the event's own timezone, never the viewer's.
  * A CPD advertised for 09:00 in Accra must read 09:00 to a participant in
  * Lagos, or people arrive an hour early.

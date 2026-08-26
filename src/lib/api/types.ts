@@ -85,6 +85,24 @@ export interface EventSession {
   endAt: string;
   location: string | null;
   requiredForAttendance: boolean;
+  /** Absent on a CPD event's linear agenda — set only on a Summit session. */
+  trackId: string | null;
+}
+
+export interface EventTrack {
+  id: string;
+  name: string;
+  description: string | null;
+  color: string | null;
+  sortOrder: number;
+}
+
+export interface SponsorshipTier {
+  id: string;
+  name: string;
+  benefits: string | null;
+  money: Money | null;
+  sortOrder: number;
 }
 
 export interface EventSpeaker {
@@ -109,6 +127,13 @@ export interface CpdDetail {
   learningObjectives: string[];
   targetAudience: string[];
   requirements: string | null;
+}
+
+export interface SummitDetail {
+  theme: string | null;
+  callForPapersOpensAt: string | null;
+  callForPapersClosesAt: string | null;
+  keynoteCount: number | null;
 }
 
 export interface PublicEvent {
@@ -150,17 +175,36 @@ export interface PublicEvent {
     websiteUrl: string | null;
     logo: { id: string; url: string; mimeType: string } | null;
     role: 'PARTNER' | 'SPONSOR' | 'HOST' | 'FUNDER' | 'ACCREDITOR' | 'SUPPORTER';
+    /** Meaningful only when role is SPONSOR, and only on a Summit event. */
+    sponsorshipTierId: string | null;
   }[];
   prices?: EventPrice[];
   questions?: RegistrationQuestion[];
   sessions?: EventSession[];
   speakers?: EventSpeaker[];
   cpd?: CpdDetail;
+  summit?: SummitDetail;
+  tracks?: EventTrack[];
+  sponsorshipTiers?: SponsorshipTier[];
   availability?: {
     inPerson: { isFull: boolean } | null;
     virtual: { isFull: boolean } | null;
   };
   contact: { email: string | null; phone: string | null };
+}
+
+export interface AbstractSubmission {
+  id: string;
+  reference: string;
+  title: string;
+  abstractText: string;
+  status: 'SUBMITTED' | 'UNDER_REVIEW' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+  coAuthors: { name: string; affiliation?: string; email?: string }[];
+  submittedAt: string;
+  decidedAt: string | null;
+  track: { id: string; name: string } | null;
+  paper: { id: string; url: string; originalName: string } | null;
+  event?: { id: string; title: string; slug: string };
 }
 
 export interface Registration {
@@ -201,6 +245,20 @@ export interface Registration {
     organization: string | null;
     countryCode: string | null;
   };
+}
+
+/** What the QR code on a certificate resolves to — no login required. */
+export interface CertificateVerification {
+  valid: boolean;
+  status: 'PENDING' | 'GENERATING' | 'ISSUED' | 'FAILED' | 'REVOKED';
+  verificationCode: string;
+  participantName: string;
+  eventTitle: string;
+  dateLabel: string;
+  venue: string | null;
+  issuedAt: string | null;
+  revokedAt: string | null;
+  revokedReason?: string;
 }
 
 export interface Quote {

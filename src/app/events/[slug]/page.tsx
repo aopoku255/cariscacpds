@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { apiRequestOrNull } from '@/lib/api/client';
-import type { PublicEvent, EventPrice } from '@/lib/api/types';
+import type { PublicEvent, EventPrice, EventSession } from '@/lib/api/types';
 import { Badge, Callout, ButtonLink, Card } from '@/components/ui';
 import {
   eventDateRange, eventTime, timezoneLabel, deliveryLabel, money, eventStatusLabel,
@@ -111,6 +111,55 @@ function FeeTable({ prices }: { prices: EventPrice[] }) {
   );
 }
 
+function PartnerGrid({ partners }: { partners: NonNullable<PublicEvent['partners']> }) {
+  return (
+    <ul className={styles.partners}>
+      {partners.map((partner) => {
+        const logo = assetUrl(partner.logo?.url);
+        const inner = (
+          <>
+            {logo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logo} alt={partner.name} className={styles.partnerLogo} loading="lazy" />
+            ) : (
+              <span className={styles.partnerName}>{partner.name}</span>
+            )}
+            <span className={styles.partnerRole}>{PARTNER_ROLE[partner.role]}</span>
+          </>
+        );
+
+        return (
+          <li key={partner.id} className={styles.partner}>
+            {partner.websiteUrl ? (
+              <a href={partner.websiteUrl} target="_blank" rel="noreferrer noopener"
+                className={styles.partnerLink} title={partner.name}>
+                {inner}
+              </a>
+            ) : inner}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function SessionRow({ session, timezone }: { session: EventSession; timezone: string }) {
+  return (
+    <li>
+      <div className={styles.agendaTime}>
+        <time dateTime={session.startAt}>{eventTime(session.startAt, timezone)}</time>
+        <span aria-hidden="true">–</span>
+        <time dateTime={session.endAt}>{eventTime(session.endAt, timezone)}</time>
+      </div>
+      <div>
+        <h3 className={styles.agendaTitle}>{session.title}</h3>
+        {session.description && <p className={styles.agendaText}>{session.description}</p>}
+        {session.location && <p className={styles.agendaWhere}>{session.location}</p>}
+      </div>
+    </li>
+  );
+}
+
 export default async function EventPage({ params }: { params: Params }) {
   const { slug } = await params;
   const event = await loadEvent(slug);
@@ -124,6 +173,15 @@ export default async function EventPage({ params }: { params: Params }) {
     (event.deliveryMode === 'OFFLINE' && inPersonFull)
     || (event.deliveryMode === 'ONLINE' && virtualFull)
     || (event.deliveryMode === 'HYBRID' && inPersonFull && virtualFull);
+
+  // A call for papers with no dates set stays open indefinitely — only an
+  // explicit closing date in the past shuts it, matching the API's own rule.
+  const now = Date.now();
+  const cfpOpensAt = event.summit?.callForPapersOpensAt ? new Date(event.summit.callForPapersOpensAt).getTime() : null;
+  const cfpClosesAt = event.summit?.callForPapersClosesAt ? new Date(event.summit.callForPapersClosesAt).getTime() : null;
+  const callForPapersOpen = event.type?.key === 'summit'
+    && (cfpOpensAt === null || cfpOpensAt <= now)
+    && (cfpClosesAt === null || cfpClosesAt > now);
 
   const banner = assetUrl(event.banner?.url);
 
@@ -226,6 +284,12 @@ export default async function EventPage({ params }: { params: Params }) {
                   Contact us if you believe you should still be able to attend.
                 </Callout>
               )}
+
+              {!cancelled && callForPapersOpen && (
+                <ButtonLink href={`/events/${event.slug}/abstracts`} variant="secondary">
+                  Submit an abstract
+                </ButtonLink>
+              )}
             </div>
             </aside>
           </div>
@@ -266,22 +330,48 @@ export default async function EventPage({ params }: { params: Params }) {
           {event.sessions?.length ? (
             <section className={styles.section}>
               <h2>Programme</h2>
-              <ol className={styles.agenda}>
-                {event.sessions.map((s) => (
-                  <li key={s.id}>
-                    <div className={styles.agendaTime}>
-                      <time dateTime={s.startAt}>{eventTime(s.startAt, event.timezone)}</time>
-                      <span aria-hidden="true">–</span>
-                      <time dateTime={s.endAt}>{eventTime(s.endAt, event.timezone)}</time>
-                    </div>
-                    <div>
-                      <h3 className={styles.agendaTitle}>{s.title}</h3>
-                      {s.description && <p className={styles.agendaText}>{s.description}</p>}
-                      {s.location && <p className={styles.agendaWhere}>{s.location}</p>}
-                    </div>
-                  </li>
-                ))}
-              </ol>
+              {event.tracks?.length ? (
+                // Grouped by track — a Summit's parallel streams. Any session
+                // left untagged still shows, under its own "General" heading,
+                // rather than silently vanishing from the agenda.
+                (() => {
+                  const byTrack = new Map(event.tracks.map((t) => [t.id, { track: t, sessions: [] as EventSession[] }]));
+                  const untracked: EventSession[] = [];
+                  for (const s of event.sessions) {
+                    const bucket = s.trackId ? byTrack.get(s.trackId) : undefined;
+                    if (bucket) bucket.sessions.push(s); else untracked.push(s);
+                  }
+                  const groups = [...byTrack.values()].filter((g) => g.sessions.length > 0);
+                  return (
+                    <>
+                      {groups.map(({ track, sessions }) => (
+                        <div key={track.id} className={styles.trackGroup}>
+                          <h3 className={styles.trackHeading}>
+                            <span className={styles.trackSwatch} style={track.color ? { background: track.color } : undefined} aria-hidden="true" />
+                            {track.name}
+                          </h3>
+                          {track.description && <p className={styles.trackDescription}>{track.description}</p>}
+                          <ol className={styles.agenda}>
+                            {sessions.map((s) => <SessionRow key={s.id} session={s} timezone={event.timezone} />)}
+                          </ol>
+                        </div>
+                      ))}
+                      {untracked.length > 0 && (
+                        <div className={styles.trackGroup}>
+                          {groups.length > 0 && <h3 className={styles.trackHeading}>General</h3>}
+                          <ol className={styles.agenda}>
+                            {untracked.map((s) => <SessionRow key={s.id} session={s} timezone={event.timezone} />)}
+                          </ol>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()
+              ) : (
+                <ol className={styles.agenda}>
+                  {event.sessions.map((s) => <SessionRow key={s.id} session={s} timezone={event.timezone} />)}
+                </ol>
+              )}
             </section>
           ) : null}
 
@@ -311,38 +401,43 @@ export default async function EventPage({ params }: { params: Params }) {
             </section>
           ) : null}
 
-          {event.partners && event.partners.length > 0 && (
-            <section className={styles.section}>
-              <h2>In partnership with</h2>
-              <ul className={styles.partners}>
-                {event.partners.map((partner) => {
-                  const logo = assetUrl(partner.logo?.url);
-                  const inner = (
-                    <>
-                      {logo ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={logo} alt={partner.name} className={styles.partnerLogo} loading="lazy" />
-                      ) : (
-                        <span className={styles.partnerName}>{partner.name}</span>
-                      )}
-                      <span className={styles.partnerRole}>{PARTNER_ROLE[partner.role]}</span>
-                    </>
-                  );
+          {event.partners && event.partners.length > 0 && (() => {
+            const tiers = event.sponsorshipTiers ?? [];
+            const tierById = new Map(tiers.map((t) => [t.id, t]));
+            const tiered = tiers.length
+              ? event.partners.filter((p) => p.sponsorshipTierId && tierById.has(p.sponsorshipTierId))
+              : [];
+            const untiered = tiers.length
+              ? event.partners.filter((p) => !(p.sponsorshipTierId && tierById.has(p.sponsorshipTierId)))
+              : event.partners;
 
-                  return (
-                    <li key={partner.id} className={styles.partner}>
-                      {partner.websiteUrl ? (
-                        <a href={partner.websiteUrl} target="_blank" rel="noreferrer noopener"
-                          className={styles.partnerLink} title={partner.name}>
-                          {inner}
-                        </a>
-                      ) : inner}
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          )}
+            return (
+              <>
+                {tiers.length > 0 && tiered.length > 0 && (
+                  <section className={styles.section}>
+                    <h2>Sponsors</h2>
+                    {tiers.map((tier) => {
+                      const sponsors = tiered.filter((p) => p.sponsorshipTierId === tier.id);
+                      if (sponsors.length === 0) return null;
+                      return (
+                        <div key={tier.id} className={styles.tierGroup}>
+                          <h3 className={styles.tierHeading}>{tier.name}</h3>
+                          <PartnerGrid partners={sponsors} />
+                        </div>
+                      );
+                    })}
+                  </section>
+                )}
+
+                {untiered.length > 0 && (
+                  <section className={styles.section}>
+                    <h2>In partnership with</h2>
+                    <PartnerGrid partners={untiered} />
+                  </section>
+                )}
+              </>
+            );
+          })()}
 
           {event.cpd?.requirements && (
             <section className={styles.section}>

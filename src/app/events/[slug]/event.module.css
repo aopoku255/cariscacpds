@@ -201,3 +201,23 @@
   font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.07em;
   color: var(--color-text-subtle);
 }
+
+/* --- tracks and tiers, Summit only --------------------------------------- */
+/* A grouped list rather than parallel columns: columns need a shared time
+   axis and break on mobile, which is how most participants read this site.
+   A CPD event never has tracks, so this block simply never renders there. */
+.trackGroup { margin-bottom: var(--space-6); }
+.trackGroup:last-child { margin-bottom: 0; }
+.trackHeading {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-size: var(--text-md); margin-bottom: var(--space-3);
+}
+.trackSwatch {
+  display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--color-highlight); flex: none;
+}
+.trackDescription { color: var(--color-text-subtle); font-size: var(--text-sm); margin-bottom: var(--space-3); }
+
+.tierGroup { margin-bottom: var(--space-6); }
+.tierGroup:last-child { margin-bottom: 0; }
+.tierHeading { font-size: var(--text-md); margin-bottom: var(--space-3); }

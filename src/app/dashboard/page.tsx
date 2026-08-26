@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession, apiAsUser } from '@/lib/auth/session';
-import type { Registration } from '@/lib/api/types';
+import type { Registration, AbstractSubmission } from '@/lib/api/types';
 import { Badge, Card, EmptyState, ButtonLink, Callout } from '@/components/ui';
+import uiStyles from '@/components/ui/ui.module.css';
 import {
   eventDateRange, money, registrationStatusLabel, registrationTone,
   attendanceLabel, relativeDeadline,
@@ -67,6 +68,40 @@ function RegistrationRow({ registration }: { registration: Registration }) {
   );
 }
 
+function CertificateRow({ registration }: { registration: Registration }) {
+  const event = registration.event;
+
+  return (
+    <li className={styles.regRow}>
+      <div className={styles.regMain}>
+        <div className={styles.regHead}>
+          <span className={styles.reference}>{registration.reference}</span>
+        </div>
+        <h3 className={styles.regTitle}>{event?.title ?? 'Event'}</h3>
+        {event && (
+          <p className={styles.regMeta}>{eventDateRange(event.startAt, event.endAt, event.timezone)}</p>
+        )}
+      </div>
+
+      {/*
+        Plain anchors, not next/link: this URL is a Route Handler that
+        streams a file, not a page, and Next's client-side router would
+        otherwise try to soft-navigate to it as one.
+      */}
+      <div className={styles.regAction} style={{ display: 'flex', gap: 'var(--space-3)' }}>
+        <a href={`/dashboard/registrations/${registration.reference}/certificate?format=pdf`}
+          className={`${uiStyles.button} ${uiStyles['v-primary']} ${uiStyles['s-sm']}`}>
+          Download PDF
+        </a>
+        <a href={`/dashboard/registrations/${registration.reference}/certificate?format=png`}
+          className={`${uiStyles.button} ${uiStyles['v-secondary']} ${uiStyles['s-sm']}`}>
+          Download image
+        </a>
+      </div>
+    </li>
+  );
+}
+
 export default async function DashboardPage() {
   const user = await getSession();
   if (!user) redirect('/login?next=/dashboard');
@@ -80,6 +115,18 @@ export default async function DashboardPage() {
     loadFailed = true;
   }
 
+  // Most CARISCA participants never submit an abstract — CPD courses don't
+  // take them at all — so this only earns a place on the dashboard once
+  // there is actually something to show, the same restraint the
+  // "Certificates" section below doesn't get to take.
+  let abstractCount = 0;
+  try {
+    const { data } = await apiAsUser<AbstractSubmission[]>('/summit/abstracts/mine');
+    abstractCount = data?.length ?? 0;
+  } catch {
+    abstractCount = 0;
+  }
+
   const now = Date.now();
   const upcoming = registrations.filter((r) =>
     LIVE.includes(r.status) && r.event && new Date(r.event.endAt).getTime() >= now);
@@ -88,6 +135,7 @@ export default async function DashboardPage() {
   const other = registrations.filter((r) => !upcoming.includes(r) && !past.includes(r));
 
   const awaitingPayment = upcoming.filter((r) => r.status === 'PENDING_PAYMENT');
+  const certified = registrations.filter((r) => r.certificate?.eligible);
 
   return (
     <div className="shell">
@@ -157,18 +205,34 @@ export default async function DashboardPage() {
           </section>
         )}
 
-        {/*
-          Certificates get their own surface in Week 3. Saying so beats an
-          empty box a participant cannot explain.
-        */}
+        {abstractCount > 0 && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>Abstract submissions</h2>
+            <Card>
+              <p className={styles.pending}>
+                {abstractCount} submission{abstractCount === 1 ? '' : 's'} to Summit calls for papers.
+              </p>
+              <p style={{ marginTop: 'var(--space-3)' }}>
+                <Link href="/dashboard/abstracts">View your submissions<span aria-hidden="true"> →</span></Link>
+              </p>
+            </Card>
+          </section>
+        )}
+
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Certificates</h2>
-          <Card>
-            <p className={styles.pending}>
-              Certificates appear here once an event has finished and your attendance
-              is confirmed. You will get an email when yours is ready.
-            </p>
-          </Card>
+          {certified.length > 0 ? (
+            <ul className={styles.regList}>
+              {certified.map((r) => <CertificateRow key={r.id} registration={r} />)}
+            </ul>
+          ) : (
+            <Card>
+              <p className={styles.pending}>
+                Certificates appear here once an event has finished and your attendance
+                is confirmed. You will get an email when yours is ready.
+              </p>
+            </Card>
+          )}
         </section>
       </div>
     </div>
