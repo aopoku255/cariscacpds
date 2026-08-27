@@ -1,29 +1,29 @@
 'use client';
 
-import type { RegistrationQuestion } from '@/lib/api/types';
+import type { RegistrationQuestion, SurveyQuestion } from '@/lib/api/types';
 import {
   Field, inputClass, selectClass, textareaClass, checkRowClass,
 } from '@/components/ui';
 
 /**
- * Renders one configured registration question.
- *
- * The question set is data, so this has to handle every type the admin can
- * choose without knowing anything about a particular event. Field names are
- * `answers[<id>]` so the server can match them back to the question rows it
- * will validate against — the client's own validation is a courtesy, not the
- * check that counts.
+ * Renders one configured question — a registration question or a survey
+ * question. The question set is data, so this has to handle every type the
+ * admin can choose without knowing anything about a particular event. Field
+ * names are `answers[<id>]` so the server can match them back to the
+ * question rows it will validate against — the client's own validation is a
+ * courtesy, not the check that counts.
  */
 export function QuestionField({
   question, error, defaultValue,
 }: {
-  question: RegistrationQuestion;
+  question: RegistrationQuestion | SurveyQuestion;
   error?: string;
   defaultValue?: string | string[];
 }) {
   const id = `q-${question.id}`;
   const name = `answers[${question.id}]`;
   const options = question.options ?? [];
+  const helpText = 'helpText' in question ? question.helpText : null;
 
   const common = {
     id,
@@ -36,12 +36,39 @@ export function QuestionField({
     <Field
       label={question.label}
       htmlFor={id}
-      hint={question.helpText}
+      hint={helpText}
       error={error}
       required={question.required}
     >
       {(() => {
         switch (question.type) {
+          case 'RATING':
+          case 'NPS': {
+            const scale = question.type === 'RATING'
+              ? [1, 2, 3, 4, 5]
+              : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            return (
+              <div className="stack stack-2" role="radiogroup" aria-labelledby={id}>
+                <div className={checkRowClass} style={{ gap: 'var(--space-3)', flexWrap: 'wrap' }}>
+                  {scale.map((n) => (
+                    <label key={n} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+                      <input
+                        type="radio"
+                        name={name}
+                        value={String(n)}
+                        required={question.required}
+                        defaultChecked={defaultValue === String(n)}
+                      />
+                      <span>{n}</span>
+                    </label>
+                  ))}
+                </div>
+                {question.type === 'NPS' && (
+                  <p className="subtle">0 = not at all likely, 10 = extremely likely</p>
+                )}
+              </div>
+            );
+          }
           case 'LONGTEXT':
             return (
               <textarea
@@ -110,7 +137,7 @@ export function QuestionField({
                   required={question.required}
                   defaultChecked={defaultValue === 'yes'}
                 />
-                <span>{question.helpText ?? 'Yes'}</span>
+                <span>{helpText ?? 'Yes'}</span>
               </label>
             );
 

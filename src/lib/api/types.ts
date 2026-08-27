@@ -66,6 +66,20 @@ export interface RegistrationQuestion {
   sortOrder: number;
 }
 
+/** No EMAIL/PHONE/FILE (not in `evaluation_questions`' own type enum) — RATING/NPS added instead. */
+export type SurveyQuestionType =
+  | 'TEXT' | 'LONGTEXT' | 'NUMBER' | 'SELECT' | 'MULTISELECT'
+  | 'RADIO' | 'CHECKBOX' | 'RATING' | 'NPS' | 'DATE';
+
+/** One question of the post-event survey — no `helpText` column, unlike a registration question. */
+export interface SurveyQuestion {
+  id: string;
+  label: string;
+  type: SurveyQuestionType;
+  options: QuestionOption[] | null;
+  required: boolean;
+}
+
 export interface EventPrice {
   id: string;
   tier: string;
@@ -336,6 +350,8 @@ export interface SessionUser {
   stateProvince: string | null;
   organization: string | null;
   jobTitle: string | null;
+  positionId: string | null;
+  sectorId: string | null;
   emailOptOut: boolean;
   status: string;
   isStaff?: boolean;

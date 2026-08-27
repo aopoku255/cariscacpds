@@ -105,10 +105,10 @@ export function ProfileForm({
           </span>
         </div>
 
-        <Field label="Phone" htmlFor="phone" error={err('phone')}
-          hint="Optional. Used only if we need to reach you about an event.">
+        <Field label="Phone" htmlFor="phone" error={err('phone')} required
+          hint="Used only if we need to reach you about an event.">
           <input id="phone" name="phone" type="tel" className={inputClass}
-            autoComplete="tel" defaultValue={profile.phone ?? ''} maxLength={32} />
+            autoComplete="tel" defaultValue={profile.phone ?? ''} maxLength={32} required />
         </Field>
 
         <label className={checkRowClass}>
@@ -126,30 +126,30 @@ export function ProfileForm({
         <legend className={styles.groupTitle}>Your work</legend>
 
         <div className={styles.pair}>
-          <Field label="Organization" htmlFor="organization" error={err('organization')}>
+          <Field label="Organization" htmlFor="organization" error={err('organization')} required>
             <input id="organization" name="organization" className={inputClass}
-              autoComplete="organization" defaultValue={profile.organization ?? ''} maxLength={160} />
+              autoComplete="organization" defaultValue={profile.organization ?? ''} maxLength={160} required />
           </Field>
-          <Field label="Job title" htmlFor="jobTitle" error={err('jobTitle')}>
+          <Field label="Job title" htmlFor="jobTitle" error={err('jobTitle')} required>
             <input id="jobTitle" name="jobTitle" className={inputClass}
-              autoComplete="organization-title" defaultValue={profile.jobTitle ?? ''} maxLength={160} />
+              autoComplete="organization-title" defaultValue={profile.jobTitle ?? ''} maxLength={160} required />
           </Field>
         </div>
 
         <div className={styles.pair}>
-          <Field label="Position" htmlFor="positionKey" error={err('positionKey')}>
+          <Field label="Position" htmlFor="positionKey" error={err('positionKey')} required>
             <select id="positionKey" name="positionKey" className={selectClass}
-              defaultValue={profile.position?.key ?? ''}>
-              <option value="">Not set</option>
+              defaultValue={profile.position?.key ?? ''} required>
+              <option value="" disabled>Select one</option>
               {reference.positions.map((p) => (
                 <option key={p.key} value={p.key}>{p.label}</option>
               ))}
             </select>
           </Field>
-          <Field label="Sector" htmlFor="sectorKey" error={err('sectorKey')}>
+          <Field label="Sector" htmlFor="sectorKey" error={err('sectorKey')} required>
             <select id="sectorKey" name="sectorKey" className={selectClass}
-              defaultValue={profile.sector?.key ?? ''}>
-              <option value="">Not set</option>
+              defaultValue={profile.sector?.key ?? ''} required>
+              <option value="" disabled>Select one</option>
               {reference.sectors.map((s) => (
                 <option key={s.key} value={s.key}>{s.label}</option>
               ))}
@@ -165,10 +165,10 @@ export function ProfileForm({
           you are quoted.
         </p>
 
-        <Field label="Country" htmlFor="countryCode" error={err('countryCode')}>
+        <Field label="Country" htmlFor="countryCode" error={err('countryCode')} required>
           <select id="countryCode" name="countryCode" className={selectClass}
-            defaultValue={profile.countryCode ?? ''}>
-            <option value="">Not set</option>
+            defaultValue={profile.countryCode ?? ''} required>
+            <option value="" disabled>Select one</option>
             {reference.countries.map((c) => (
               <option key={c.code} value={c.code}>{c.name}</option>
             ))}

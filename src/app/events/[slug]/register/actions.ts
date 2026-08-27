@@ -86,6 +86,13 @@ export async function registerForEventAction(
         redirect(`/login?next=${encodeURIComponent(`/events/${slug}/register`)}`);
       }
 
+      // The page itself already checks this before the form ever renders —
+      // reaching here means the profile changed (or was cleared) in another
+      // tab between then and submit. Same redirect either way.
+      if (err.code === 'PROFILE_INCOMPLETE') {
+        redirect(`/dashboard/profile?next=${encodeURIComponent(`/events/${slug}/register`)}`);
+      }
+
       // These are ordinary outcomes, not faults — say what happened plainly.
       const known: Record<string, string> = {
         ALREADY_REGISTERED: 'You are already registered for this event. Check your dashboard for the details.',

@@ -182,6 +182,18 @@ export default async function RegistrationPage({
           </Card>
         )}
 
+        {registration.certificate?.eligible === false && registration.certificate.code === 'EVALUATION_REQUIRED' && (
+          <Card>
+            <h2 className={styles.cardTitle}>Your certificate</h2>
+            <p className={styles.subtle}>{registration.certificate.reason}</p>
+            <div className={styles.footerActions}>
+              <ButtonLink href={`/dashboard/registrations/${reference}/survey`}>
+                Complete the survey
+              </ButtonLink>
+            </div>
+          </Card>
+        )}
+
         {registration.status === 'CONFIRMED' && (
           <Card>
             <h2 className={styles.cardTitle}>Your check-in code</h2>

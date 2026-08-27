@@ -56,6 +56,13 @@ export default async function ProfilePage({ searchParams }: { searchParams: Sear
           </p>
         </header>
 
+        {next && (
+          <Callout tone="info" title="Finish your profile to continue">
+            A few details are still missing. Fill in the required fields below,
+            then you will be sent back to finish what you were doing.
+          </Callout>
+        )}
+
         {referenceFailed && (
           <Callout tone="warning" title="Some options could not be loaded">
             The country, position and sector lists are unavailable at the moment.

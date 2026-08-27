@@ -6,6 +6,7 @@ import { getSession, apiAsUser } from '@/lib/auth/session';
 import type { PublicEvent, Quote } from '@/lib/api/types';
 import { Callout, ButtonLink } from '@/components/ui';
 import { eventDateRange } from '@/lib/format';
+import { isProfileComplete } from '@/lib/profile-completeness';
 import { RegisterForm } from './RegisterForm';
 import styles from './register.module.css';
 
@@ -26,6 +27,13 @@ export default async function RegisterPage({ params }: { params: Params }) {
   if (!user) {
     // Come back here after signing in rather than dumping them on the dashboard.
     redirect(`/login?next=${encodeURIComponent(`/events/${slug}/register`)}`);
+  }
+
+  // Send them to finish their profile before they ever see the registration
+  // form — cheaper than letting them fill the whole thing out and rejecting
+  // it at submit. They land back here once the profile is saved.
+  if (!isProfileComplete(user)) {
+    redirect(`/dashboard/profile?next=${encodeURIComponent(`/events/${slug}/register`)}`);
   }
 
   if (event.status === 'CANCELLED') {
