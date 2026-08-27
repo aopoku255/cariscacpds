@@ -51,7 +51,7 @@ export function ProfileForm({
           <Field label="Title" htmlFor="prefix" error={err('prefix')}>
             <select id="prefix" name="prefix" className={selectClass}
               defaultValue={profile.prefix ?? ''}>
-              <option value="">—</option>
+              <option value="">None</option>
               {reference.prefixes.map((p) => <option key={p} value={p}>{p}</option>)}
             </select>
           </Field>
@@ -79,7 +79,7 @@ export function ProfileForm({
           <Field label="Suffix" htmlFor="suffix" error={err('suffix')}>
             <select id="suffix" name="suffix" className={selectClass}
               defaultValue={profile.suffix ?? ''}>
-              <option value="">—</option>
+              <option value="">None</option>
               {reference.suffixes.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </Field>
@@ -101,7 +101,7 @@ export function ProfileForm({
           <span className={styles.readonlyValue}>{profile.email}</span>
           <span className={styles.groupNote}>
             Your confirmations, QR codes and certificates go here. Contact us if
-            it needs changing — a new address has to be verified.
+            it needs changing. A new address has to be verified.
           </span>
         </div>
 

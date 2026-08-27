@@ -63,8 +63,8 @@ export function WaitingStep({
   if (timedOut) {
     return (
       <Callout tone="info" title="Still waiting">
-        This is taking longer than expected. Refresh this page in a moment to check again —
-        your payment may still complete.
+        This is taking longer than expected. Refresh this page in a moment to check again.
+        Your payment may still complete.
       </Callout>
     );
   }
