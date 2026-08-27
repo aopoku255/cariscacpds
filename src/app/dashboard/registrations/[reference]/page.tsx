@@ -94,15 +94,13 @@ export default async function RegistrationPage({
               </>
             )}
 
-            {/*
-              Payment providers land in Week 2. Showing a dead "Pay now" button
-              would be worse than saying plainly where things stand.
-            */}
-            <Callout tone="warning" title="Online payment is not switched on yet">
-              Card and mobile money payment goes live shortly. In the meantime the
-              CARISCA team will contact you with payment instructions, or email{' '}
-              <a href="mailto:info@carisca.knust.edu.gh">info@carisca.knust.edu.gh</a>.
-            </Callout>
+            {!expired && (
+              <div className={styles.footerActions}>
+                <ButtonLink href={`/dashboard/registrations/${reference}/pay`}>
+                  Pay now
+                </ButtonLink>
+              </div>
+            )}
           </Card>
         )}
 
@@ -170,6 +168,17 @@ export default async function RegistrationPage({
                 Download image
               </a>
             </div>
+          </Card>
+        )}
+
+        {registration.certificate?.eligible === false && registration.certificate.code === 'EVENT_NOT_FINISHED' && (
+          <Card>
+            <h2 className={styles.cardTitle}>Your certificate</h2>
+            <p className={styles.subtle}>
+              {event
+                ? `Available once the programme ends on ${eventDateRange(event.endAt, event.endAt, event.timezone)}.`
+                : registration.certificate.reason}
+            </p>
           </Card>
         )}
 

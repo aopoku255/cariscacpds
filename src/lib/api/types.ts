@@ -261,6 +261,30 @@ export interface CertificateVerification {
   revokedReason?: string;
 }
 
+export type PaymentStatus = 'PENDING' | 'PROCESSING' | 'SUCCESSFUL' | 'FAILED' | 'CANCELLED' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
+
+export interface Payment {
+  reference: string;
+  status: PaymentStatus;
+  amount: Money;
+  checkoutUrl: string | null;
+  failureReason: string | null;
+}
+
+/** What POST /payments/initiate and the OTP/PIN/birthday submit routes return. */
+export interface PaymentInitiation {
+  reference: string;
+  status: string;
+  displayText: string | null;
+  checkoutUrl: string | null;
+}
+
+/** One entry from GET /payments/banks — Nigeria's "Pay with Bank" picker. */
+export interface Bank {
+  name: string;
+  code: string;
+}
+
 export interface Quote {
   eventId: string;
   attendanceMode: AttendanceMode;
