@@ -38,7 +38,9 @@ export default async function ProfilePage({ searchParams }: { searchParams: Sear
   let reference = EMPTY_REFERENCE;
   let referenceFailed = false;
   try {
-    const { data } = await apiRequest<ReferenceData>('/reference', { revalidate: 3600 });
+    // Not time-revalidated — see events/page.tsx for why. This data is small
+    // and rarely changes, so fetching it fresh each time costs little.
+    const { data } = await apiRequest<ReferenceData>('/reference');
     reference = data;
   } catch {
     referenceFailed = true;

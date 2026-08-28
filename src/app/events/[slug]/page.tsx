@@ -10,12 +10,13 @@ import {
 import { assetUrl } from '@/lib/api/assets';
 import styles from './event.module.css';
 
-export const revalidate = 60;
+// See events/page.tsx for why this is dynamic rather than time-revalidated.
+export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ slug: string }>;
 
 async function loadEvent(slug: string) {
-  return apiRequestOrNull<PublicEvent>(`/events/${encodeURIComponent(slug)}`, { revalidate: 60 });
+  return apiRequestOrNull<PublicEvent>(`/events/${encodeURIComponent(slug)}`);
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {

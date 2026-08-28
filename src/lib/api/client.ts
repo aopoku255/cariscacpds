@@ -45,8 +45,6 @@ export class ApiError extends Error {
 export interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
   token?: string | null;
-  /** Seconds. Server-side only; omit for no caching. */
-  revalidate?: number;
   query?: Record<string, string | number | boolean | undefined | null>;
 }
 
@@ -63,7 +61,7 @@ function buildUrl(path: string, query?: RequestOptions['query']) {
 
 export async function apiRequest<T>(
   path: string,
-  { body, token, revalidate, query, headers, ...init }: RequestOptions = {},
+  { body, token, query, headers, ...init }: RequestOptions = {},
 ): Promise<{ data: T; meta?: PageMeta; message: string | null }> {
   const url = buildUrl(path, query);
 
@@ -76,11 +74,12 @@ export async function apiRequest<T>(
       ...headers,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
-    ...(isServer && revalidate !== undefined
-      ? { next: { revalidate } }
-      : isServer
-        ? { cache: 'no-store' as RequestCache }
-        : {}),
+    // Server-side responses are never cached across requests — this app's
+    // `output: standalone` Docker deployment doesn't reliably run Next's
+    // background revalidation for a time-based cache (`next: { revalidate }`),
+    // so anything cached that way can freeze stale indefinitely instead of
+    // refreshing. See events/page.tsx for how that actually showed up.
+    ...(isServer ? { cache: 'no-store' as RequestCache } : {}),
   });
 
   const text = await response.text();

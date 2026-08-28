@@ -19,7 +19,9 @@ export default async function RegisterPage({ searchParams }: { searchParams: Sea
 
   let countries: ReferenceData['countries'] = [];
   try {
-    const { data } = await apiRequest<ReferenceData>('/reference', { revalidate: 3600 });
+    // Not time-revalidated — see events/page.tsx for why. This data is small
+    // and rarely changes, so fetching it fresh each time costs little.
+    const { data } = await apiRequest<ReferenceData>('/reference');
     countries = data.countries;
   } catch {
     // The country field degrades to empty rather than blocking sign-up.

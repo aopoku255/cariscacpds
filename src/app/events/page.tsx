@@ -12,9 +12,13 @@ export const metadata: Metadata = {
     'Continuing professional development, summits and business forums from CARISCA at KNUST.',
 };
 
-// Listings are public and change rarely; a short revalidate keeps them fast
-// and indexable without serving stale registration states for long.
-export const revalidate = 60;
+// Time-based revalidation (`revalidate: N`) doesn't reliably refresh in this
+// app's `output: standalone` Docker deployment — a newly published event was
+// found stuck out of the listing indefinitely, well past its 60s window,
+// until the container was recreated. Always fetching fresh costs a little
+// latency per request; a listing an admin just changed silently not
+// reflecting it is worse.
+export const dynamic = 'force-dynamic';
 
 type SearchParams = Promise<{ when?: string; q?: string; page?: string }>;
 
@@ -35,7 +39,6 @@ export default async function EventsPage({ searchParams }: { searchParams: Searc
   try {
     const result = await apiRequest<PublicEvent[]>('/events', {
       query: { when, q: params.q, page, limit: 12 },
-      revalidate: 60,
     });
     events = result.data ?? [];
     meta = result.meta;

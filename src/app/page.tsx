@@ -6,14 +6,14 @@ import { ButtonLink } from '@/components/ui';
 import { Icon } from '@/components/ui/icons';
 import styles from './home.module.css';
 
-export const revalidate = 60;
+// See events/page.tsx for why this is dynamic rather than time-revalidated.
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   let events: PublicEvent[] = [];
   try {
     const result = await apiRequest<PublicEvent[]>('/events', {
       query: { when: 'upcoming', limit: 3 },
-      revalidate: 60,
     });
     events = result.data ?? [];
   } catch {
