@@ -70,6 +70,23 @@
 .section h2 { font-size: var(--text-xl); margin-bottom: var(--space-4); }
 .prose { display: flex; flex-direction: column; gap: var(--space-3); color: var(--color-text-muted); }
 
+/* When .prose renders sanitized HTML from the admin's rich text editor
+   (rather than the plain-paragraph legacy fallback), it needs typography
+   for the tags sanitizeRichText allow-lists server-side. */
+.prose :global(p) { margin: 0; }
+.prose :global(h2) { font-family: var(--font-heading); font-size: var(--text-lg); font-weight: 700; color: var(--color-text); margin: var(--space-2) 0 0; }
+.prose :global(h3) { font-family: var(--font-heading); font-size: var(--text-base); font-weight: 700; color: var(--color-text); margin: var(--space-2) 0 0; }
+.prose :global(h4) { font-family: var(--font-heading); font-size: var(--text-base); font-weight: 600; color: var(--color-text); margin: var(--space-2) 0 0; }
+.prose :global(ul),
+.prose :global(ol) { margin: 0; padding-left: var(--space-5); display: flex; flex-direction: column; gap: var(--space-1); }
+.prose :global(blockquote) {
+  margin: 0;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--color-border-strong);
+}
+.prose :global(a) { color: var(--color-accent-text); text-decoration: underline; }
+.prose :global(strong) { color: var(--color-text); }
+
 .ticks { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-3); }
 .ticks li { padding-left: var(--space-5); position: relative; color: var(--color-text-muted); }
 .ticks li::before {
@@ -115,6 +132,7 @@
   flex-shrink: 0;
   background: var(--color-surface-sunken);
 }
+.speakerRoleBadge { display: block; margin-bottom: var(--space-1); }
 .speakerName { font-size: var(--text-md); }
 .speakerRole { color: var(--color-accent-text); font-size: var(--text-sm); font-weight: 600; }
 .speakerBio { color: var(--color-text-subtle); margin-top: var(--space-2); }

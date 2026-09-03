@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { apiRequestOrNull } from '@/lib/api/client';
-import type { PublicEvent, EventPrice, EventSession } from '@/lib/api/types';
+import type { PublicEvent, EventPrice, EventSession, EventSpeaker } from '@/lib/api/types';
 import { Badge, Callout, ButtonLink, Card } from '@/components/ui';
 import {
   eventDateRange, eventTime, timezoneLabel, deliveryLabel, money, eventStatusLabel,
@@ -14,6 +14,17 @@ import styles from './event.module.css';
 export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ slug: string }>;
+
+/**
+ * Events saved before the admin's rich text editor existed have a plain-text
+ * `description` (paragraph breaks as blank lines); ones saved since carry
+ * sanitized HTML from `sanitizeRichText` (carisca-api/src/lib/rich-text.js)
+ * — safe to render raw, since that's the one point everything is written
+ * through. This tells the two apart so old events don't regress.
+ */
+function isRichHtml(value: string) {
+  return /<[a-z][\s\S]*>/i.test(value);
+}
 
 async function loadEvent(slug: string) {
   return apiRequestOrNull<PublicEvent>(`/events/${encodeURIComponent(slug)}`);
@@ -36,6 +47,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     },
   };
 }
+
+const SPEAKER_ROLE_LABEL: Record<EventSpeaker['role'], string> = {
+  SPEAKER: 'Speaker',
+  FACILITATOR: 'Facilitator',
+  MODERATOR: 'Moderator',
+  PANELLIST: 'Panellist',
+};
 
 const AUDIENCE_LABEL: Record<EventPrice['audience'], string> = {
   ANY: 'Everyone',
@@ -302,11 +320,17 @@ export default async function EventPage({ params }: { params: Params }) {
           {event.description && (
             <section className={styles.section}>
               <h2>About this programme</h2>
-              <div className={styles.prose}>
-                {event.description.split(/\n{2,}/).map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
-              </div>
+              {isRichHtml(event.description) ? (
+                // Sanitized server-side on save — see isRichHtml above.
+                // eslint-disable-next-line react/no-danger
+                <div className={styles.prose} dangerouslySetInnerHTML={{ __html: event.description }} />
+              ) : (
+                <div className={styles.prose}>
+                  {event.description.split(/\n{2,}/).map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+                </div>
+              )}
             </section>
           )}
 
@@ -388,11 +412,14 @@ export default async function EventPage({ params }: { params: Params }) {
                         className={styles.speakerPhoto} />
                     )}
                     <div>
-                      <h3 className={styles.speakerName}>{s.name}</h3>
-                      {(s.title || s.organization) && (
-                        <p className={styles.speakerRole}>
-                          {[s.title, s.organization].filter(Boolean).join(', ')}
-                        </p>
+                      <span className={styles.speakerRoleBadge}>
+                        <Badge tone="neutral">{SPEAKER_ROLE_LABEL[s.role] ?? s.role}</Badge>
+                      </span>
+                      <h3 className={styles.speakerName}>
+                        {s.title ? `${s.title} ${s.name}` : s.name}
+                      </h3>
+                      {s.organization && (
+                        <p className={styles.speakerRole}>{s.organization}</p>
                       )}
                       {s.bio && <p className={styles.speakerBio}>{s.bio}</p>}
                     </div>
