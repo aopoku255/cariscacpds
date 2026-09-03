@@ -91,11 +91,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </h2>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/carisca-trilogo.png"
-              alt="Kwame Nkrumah University of Science and Technology, Learn Logistics by Kühne Foundation, and Arizona State University"
-              className={styles.trilogo}
-              width={1756}
-              height={274}
+              src="/kuhne.png"
+              alt="Learn Logistics by Kühne Foundation"
+              className={styles.institutionLogo}
+              width={157}
+              height={65}
               loading="lazy"
             />
           </div>

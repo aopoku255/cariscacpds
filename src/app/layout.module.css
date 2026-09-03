@@ -54,13 +54,13 @@
 }
 
 /*
-  Contained, never cropped, and left on a light ground: these are other
-  institutions' marks and are not ours to recolour.
+  Contained, never cropped, and left on a light ground: this is another
+  institution's mark and is not ours to recolour.
 */
-.trilogo {
+.institutionLogo {
   display: block;
   width: 100%;
-  max-width: 720px;
+  max-width: 220px;
   height: auto;
   margin-inline: auto;
 }
