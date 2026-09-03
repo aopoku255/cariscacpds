@@ -2,7 +2,10 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { apiRequestOrNull } from '@/lib/api/client';
-import type { PublicEvent, EventPrice, EventSession, EventSpeaker } from '@/lib/api/types';
+import { getSession, apiAsUser } from '@/lib/auth/session';
+import type {
+  PublicEvent, EventPrice, EventSession, EventSpeaker, Registration,
+} from '@/lib/api/types';
 import { Badge, Callout, ButtonLink, Card } from '@/components/ui';
 import {
   eventDateRange, eventTime, timezoneLabel, deliveryLabel, money, eventStatusLabel,
@@ -28,6 +31,56 @@ function isRichHtml(value: string) {
 
 async function loadEvent(slug: string) {
   return apiRequestOrNull<PublicEvent>(`/events/${encodeURIComponent(slug)}`);
+}
+
+type RegistrationCta = 'REGISTER' | 'PAY' | 'REGISTERED' | 'WAITLISTED';
+
+/**
+ * What to show in the hero instead of "Register for this event" when the
+ * visitor is already signed in and has been through this event before.
+ *
+ * A lapsed, unpaid hold (PENDING_PAYMENT past hold_expires_at) is treated the
+ * same as never having registered — the API reactivates that same row on a
+ * fresh registerForEventAction call rather than creating a second one (see
+ * the unique (event_id, user_id) index and the reuse branch in
+ * registration.service.js), so it is safe to invite another attempt here.
+ */
+function registrationCta(registration: Registration | undefined): RegistrationCta {
+  if (!registration) return 'REGISTER';
+
+  switch (registration.status) {
+    case 'CONFIRMED':
+      return 'REGISTERED';
+    case 'WAITLISTED':
+      return 'WAITLISTED';
+    case 'REQUIRES_REVIEW':
+      return 'PAY';
+    case 'PENDING_PAYMENT': {
+      const lapsed = registration.holdExpiresAt
+        ? new Date(registration.holdExpiresAt).getTime() <= Date.now()
+        : false;
+      return lapsed ? 'REGISTER' : 'PAY';
+    }
+    case 'CANCELLED':
+    case 'REFUNDED':
+    default:
+      return 'REGISTER';
+  }
+}
+
+async function loadMyRegistration(eventId: string) {
+  const user = await getSession();
+  if (!user) return undefined;
+
+  try {
+    const { data } = await apiAsUser<Registration[]>('/registrations/mine');
+    return data?.find((r) => r.event?.id === eventId);
+  } catch {
+    // Same fallback as the public page itself: a failed lookup should not
+    // stop the event from rendering, it just falls back to the ordinary
+    // "Register" CTA as if the visitor were signed out.
+    return undefined;
+  }
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
@@ -184,6 +237,9 @@ export default async function EventPage({ params }: { params: Params }) {
   const event = await loadEvent(slug);
   if (!event) notFound();
 
+  const myRegistration = await loadMyRegistration(event.id);
+  const cta = registrationCta(myRegistration);
+
   const isOpen = event.status === 'REGISTRATION_OPEN';
   const cancelled = event.status === 'CANCELLED';
   const inPersonFull = event.availability?.inPerson?.isFull ?? false;
@@ -276,13 +332,43 @@ export default async function EventPage({ params }: { params: Params }) {
                 </Callout>
               )}
 
-              {!cancelled && isOpen && !everythingFull && (
+              {/*
+                A signed-in visitor who already has a live relationship with
+                this event (a held place, a confirmed one, or a waitlist
+                spot) sees that instead of the ordinary open/full/closed
+                messaging below — registering again would just fail with
+                ALREADY_REGISTERED, and a paid participant has nothing left
+                to do here at all.
+              */}
+              {!cancelled && cta === 'PAY' && (
+                <ButtonLink href={`/dashboard/registrations/${myRegistration!.reference}/pay`} size="lg">
+                  Complete your payment
+                </ButtonLink>
+              )}
+
+              {!cancelled && cta === 'REGISTERED' && (
+                <Callout tone="success" title="You're registered">
+                  Check your dashboard for your registration details.
+                  {' '}
+                  <Link href={`/dashboard/registrations/${myRegistration!.reference}`}>View registration</Link>.
+                </Callout>
+              )}
+
+              {!cancelled && cta === 'WAITLISTED' && (
+                <Callout tone="info" title="You're on the waitlist">
+                  We will email you if a place opens up.
+                  {' '}
+                  <Link href={`/dashboard/registrations/${myRegistration!.reference}`}>View registration</Link>.
+                </Callout>
+              )}
+
+              {!cancelled && cta === 'REGISTER' && isOpen && !everythingFull && (
                 <ButtonLink href={`/events/${event.slug}/register`} size="lg">
                   Register for this event
                 </ButtonLink>
               )}
 
-              {!cancelled && isOpen && everythingFull && (
+              {!cancelled && cta === 'REGISTER' && isOpen && everythingFull && (
                 <Callout tone="warning" title="This event is fully booked">
                   You can still join the waitlist and we will email you if a place opens up.
                   {' '}
@@ -290,7 +376,7 @@ export default async function EventPage({ params }: { params: Params }) {
                 </Callout>
               )}
 
-              {!cancelled && event.status === 'PUBLISHED' && (
+              {!cancelled && cta === 'REGISTER' && event.status === 'PUBLISHED' && (
                 <Callout tone="info" title="Registration is not open yet">
                   {event.registrationOpensAt
                     ? `Registration opens on ${eventDateRange(event.registrationOpensAt, event.registrationOpensAt, event.timezone)}.`
@@ -298,7 +384,7 @@ export default async function EventPage({ params }: { params: Params }) {
                 </Callout>
               )}
 
-              {!cancelled && event.status === 'REGISTRATION_CLOSED' && (
+              {!cancelled && cta === 'REGISTER' && event.status === 'REGISTRATION_CLOSED' && (
                 <Callout tone="neutral" title="Registration has closed">
                   Contact us if you believe you should still be able to attend.
                 </Callout>
