@@ -10,6 +10,7 @@ import type { SessionUser } from './api/types';
 export const REQUIRED_PROFILE_FIELDS: { key: keyof SessionUser; label: string }[] = [
   { key: 'phone', label: 'Phone number' },
   { key: 'countryCode', label: 'Country' },
+  { key: 'gender', label: 'Gender' },
   { key: 'organization', label: 'Organization' },
   { key: 'jobTitle', label: 'Job title' },
   { key: 'positionId', label: 'Position' },

@@ -143,6 +143,7 @@ export async function registerGuestAction(
     email: String(formData.get('email') || '').trim(),
     phone: String(formData.get('phone') || '').trim(),
     countryCode: String(formData.get('countryCode') || '').trim(),
+    gender: String(formData.get('gender') || '').trim(),
     organization: String(formData.get('organization') || '').trim(),
     jobTitle: String(formData.get('jobTitle') || '').trim(),
     positionKey: String(formData.get('positionKey') || '').trim(),

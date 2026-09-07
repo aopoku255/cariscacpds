@@ -83,10 +83,10 @@ export function ProfileForm({
               {reference.suffixes.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </Field>
-          <Field label="Gender" htmlFor="gender" error={err('gender')}>
+          <Field label="Gender" htmlFor="gender" error={err('gender')} required>
             <select id="gender" name="gender" className={selectClass}
-              defaultValue={profile.gender ?? ''}>
-              <option value="">Prefer not to say</option>
+              defaultValue={profile.gender ?? ''} required>
+              <option value="" disabled>Select one</option>
               {reference.genders.map((g) => <option key={g} value={g}>{g}</option>)}
             </select>
           </Field>

@@ -119,10 +119,18 @@ export function GuestRegisterForm({
             autoComplete="email" maxLength={255} required />
         </Field>
 
-        <Field label="Phone" htmlFor="phone" error={err('phone')} required>
-          <input id="phone" name="phone" type="tel" className={inputClass}
-            autoComplete="tel" maxLength={32} required />
-        </Field>
+        <div className={styles.pair}>
+          <Field label="Phone" htmlFor="phone" error={err('phone')} required>
+            <input id="phone" name="phone" type="tel" className={inputClass}
+              autoComplete="tel" maxLength={32} required />
+          </Field>
+          <Field label="Gender" htmlFor="gender" error={err('gender')} required>
+            <select id="gender" name="gender" className={selectClass} defaultValue="" required>
+              <option value="" disabled>Select one</option>
+              {reference.genders.map((g) => <option key={g} value={g}>{g}</option>)}
+            </select>
+          </Field>
+        </div>
 
         <div className={styles.pair}>
           <Field label="Organization" htmlFor="organization" error={err('organization')} required>
