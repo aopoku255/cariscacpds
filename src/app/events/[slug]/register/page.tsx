@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { apiRequestOrNull } from '@/lib/api/client';
+import { apiRequest, apiRequestOrNull } from '@/lib/api/client';
 import { getSession, apiAsUser } from '@/lib/auth/session';
-import type { PublicEvent, Quote } from '@/lib/api/types';
+import type { PublicEvent, Quote, ReferenceData } from '@/lib/api/types';
 import { Callout, ButtonLink } from '@/components/ui';
 import { eventDateRange } from '@/lib/format';
 import { isProfileComplete } from '@/lib/profile-completeness';
 import { RegisterForm } from './RegisterForm';
+import { GuestRegisterForm } from './GuestRegisterForm';
 import styles from './register.module.css';
 
 export const metadata: Metadata = { title: 'Register', robots: { index: false } };
@@ -24,15 +25,14 @@ export default async function RegisterPage({ params }: { params: Params }) {
   if (!event) notFound();
 
   const user = await getSession();
-  if (!user) {
-    // Come back here after signing in rather than dumping them on the dashboard.
-    redirect(`/login?next=${encodeURIComponent(`/events/${slug}/register`)}`);
-  }
 
-  // Send them to finish their profile before they ever see the registration
-  // form — cheaper than letting them fill the whole thing out and rejecting
-  // it at submit. They land back here once the profile is saved.
-  if (!isProfileComplete(user)) {
+  // A signed-in visitor with an incomplete profile is sent to finish it
+  // before they ever see the registration form — cheaper than letting them
+  // fill the whole thing out and rejecting it at submit. They land back here
+  // once the profile is saved. A visitor with no account at all instead
+  // fills those same fields in as part of registering below, since there is
+  // no profile page to send them to yet.
+  if (user && !isProfileComplete(user)) {
     redirect(`/dashboard/profile?next=${encodeURIComponent(`/events/${slug}/register`)}`);
   }
 
@@ -68,26 +68,44 @@ export default async function RegisterPage({ params }: { params: Params }) {
     );
   }
 
-  /**
-   * Quote both ways up front so the radio buttons can show a real price
-   * immediately. The quote endpoint holds nothing and creates nothing.
-   */
   const modes = (['IN_PERSON', 'VIRTUAL'] as const).filter((m) => (
     m === 'IN_PERSON' ? event.deliveryMode !== 'ONLINE' : event.deliveryMode !== 'OFFLINE'
   ));
 
+  /**
+   * Quote both ways up front so the radio buttons can show a real price
+   * immediately. The quote endpoint holds nothing and creates nothing, but it
+   * does need to know who is asking — resolving a region-priced event's fee
+   * depends on the participant's own country. A signed-in visitor already has
+   * one on file; a guest is only about to supply it in the form below, so
+   * there is nothing to quote against yet and this is skipped for them.
+   */
   const quotes: Partial<Record<'IN_PERSON' | 'VIRTUAL', Quote>> = {};
-  await Promise.all(modes.map(async (m) => {
+  if (user) {
+    await Promise.all(modes.map(async (m) => {
+      try {
+        const { data } = await apiAsUser<Quote>('/registrations/quote', {
+          query: { eventId: event.id, attendanceMode: m },
+        });
+        quotes[m] = data;
+      } catch {
+        // A missing quote is not fatal — the server prices it again on submit,
+        // and that is the figure that counts.
+      }
+    }));
+  }
+
+  let reference: ReferenceData = {
+    countries: [], positions: [], sectors: [], currencies: [], genders: [], prefixes: [], suffixes: [],
+  };
+  if (!user) {
     try {
-      const { data } = await apiAsUser<Quote>('/registrations/quote', {
-        query: { eventId: event.id, attendanceMode: m },
-      });
-      quotes[m] = data;
+      const { data } = await apiRequest<ReferenceData>('/reference');
+      reference = data;
     } catch {
-      // A missing quote is not fatal — the server prices it again on submit,
-      // and that is the figure that counts.
+      // Degrades to empty selects rather than blocking registration outright.
     }
-  }));
+  }
 
   return (
     <div className="shell shell--narrow">
@@ -102,7 +120,9 @@ export default async function RegisterPage({ params }: { params: Params }) {
           </p>
         </header>
 
-        <RegisterForm event={event} user={user} quotes={quotes} />
+        {user
+          ? <RegisterForm event={event} user={user} quotes={quotes} />
+          : <GuestRegisterForm event={event} reference={reference} />}
       </div>
     </div>
   );

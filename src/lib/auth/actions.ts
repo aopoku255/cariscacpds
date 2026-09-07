@@ -165,7 +165,7 @@ export async function updateProfileAction(_prev: FormState, formData: FormData):
   const body: Record<string, unknown> = {};
   for (const key of [
     'prefix', 'firstName', 'middleName', 'lastName', 'suffix', 'gender',
-    'phone', 'organization', 'jobTitle', 'countryCode', 'city', 'stateProvince',
+    'phone', 'organization', 'jobTitle', 'positionKey', 'sectorKey', 'countryCode', 'city', 'stateProvince',
   ]) {
     const value = formData.get(key);
     if (value !== null && String(value).trim() !== '') body[key] = String(value).trim();

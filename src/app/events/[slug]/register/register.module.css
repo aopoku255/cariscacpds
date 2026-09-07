@@ -32,6 +32,9 @@
 .summary dt { color: var(--color-text-subtle); font-size: var(--text-sm); }
 .summary dd { margin: 0; }
 
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.signInNote { font-size: var(--text-sm); color: var(--color-text-subtle); }
+
 .fieldset { border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .legend { font-family: var(--font-heading); font-weight: 600; font-size: var(--text-base); padding: 0; margin-bottom: var(--space-1); }
 
@@ -43,4 +46,5 @@
 
 @media (max-width: 520px) {
   .summary > div { grid-template-columns: 1fr; gap: 0; }
+  .pair { grid-template-columns: 1fr; }
 }
