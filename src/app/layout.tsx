@@ -89,15 +89,26 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <h2 id="institutions-heading" className={styles.institutionsHeading}>
               A partnership of
             </h2>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/kuhne.png"
-              alt="Learn Logistics by Kühne Foundation"
-              className={styles.institutionLogo}
-              width={157}
-              height={65}
-              loading="lazy"
-            />
+            <div className={styles.institutionLogos}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/knust.svg"
+                alt="Kwame Nkrumah University of Science and Technology"
+                className={styles.institutionLogo}
+                width={125}
+                height={58}
+                loading="lazy"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/kuhne.svg"
+                alt="Learn Logistics by Kühne Foundation"
+                className={styles.institutionLogo}
+                width={774}
+                height={322}
+                loading="lazy"
+              />
+            </div>
           </div>
         </section>
 

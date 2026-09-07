@@ -53,16 +53,25 @@
   margin-bottom: var(--space-5);
 }
 
+.institutionLogos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
 /*
-  Contained, never cropped, and left on a light ground: this is another
-  institution's mark and is not ours to recolour.
+  Contained, never cropped, and left on a light ground: these are other
+  institutions' marks and are not ours to recolour. Matched by height rather
+  than width so two logos with different aspect ratios still read as the
+  same size sitting side by side.
 */
 .institutionLogo {
   display: block;
-  width: 100%;
+  height: 56px;
+  width: auto;
   max-width: 220px;
-  height: auto;
-  margin-inline: auto;
 }
 
 /* --- footer ------------------------------------------------------------------ */
