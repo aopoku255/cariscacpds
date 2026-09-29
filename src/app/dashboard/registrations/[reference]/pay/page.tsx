@@ -17,15 +17,15 @@ type Params = Promise<{ reference: string }>;
 
 /**
  * Which payment flow a currency routes through — mirrors
- * `MOBILE_MONEY_CURRENCIES`/`BANK_TRANSFER_CURRENCIES` in payment.service.js.
+ * `MOBILE_MONEY_CURRENCIES`/`CHECKOUT_CURRENCIES` in payment.service.js.
  * Channel availability follows the transaction currency/market, not a raw
  * country field, so currency (itself already resolved from the
  * participant's country at registration time) is the right signal here too.
- * Nigeria (NGN) pays by bank transfer through OGateway.
+ * Nigeria (NGN) chooses between bank transfer and OGateway's hosted checkout.
  */
-function channelFor(currency: string | undefined): 'mobile_money' | 'bank_transfer' | 'card' {
+function channelFor(currency: string | undefined): 'mobile_money' | 'ngn' | 'card' {
   if (currency === 'GHS' || currency === 'KES') return 'mobile_money';
-  if (currency === 'NGN') return 'bank_transfer';
+  if (currency === 'NGN') return 'ngn';
   return 'card';
 }
 

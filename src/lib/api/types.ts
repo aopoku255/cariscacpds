@@ -291,7 +291,7 @@ export interface PaymentInitiation {
   status: string;
   displayText: string | null;
   checkoutUrl: string | null;
-  /** Nigeria only: the temporary OGateway account to transfer into. */
+  /** Nigeria bank transfer only: the temporary account to pay into. */
   virtualAccount?: { bankName: string | null; accountName: string | null; accountNumber: string } | null;
 }
 

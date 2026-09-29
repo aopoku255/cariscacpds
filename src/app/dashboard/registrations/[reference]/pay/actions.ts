@@ -114,9 +114,38 @@ export async function submitPinAction(_prev: PayState, formData: FormData): Prom
 }
 
 /**
- * Nigeria: asks the API for a temporary OGateway virtual account. There is no
- * form input — the participant's name, phone and email come from their
- * profile — so the result is either an account to display or an error.
+ * Nigeria: asks the API for an OGateway hosted checkout session. There is no
+ * form input — the participant picks their channel on OGateway's own page —
+ * so the result is either a URL to open or an error.
+ */
+export async function initiateCheckoutAction(_prev: PayState, formData: FormData): Promise<PayState> {
+  const reference = String(formData.get('reference') || '');
+
+  try {
+    const { data } = await apiAsUser<PaymentInitiation>('/payments/initiate', {
+      method: 'POST',
+      body: { registrationReference: reference, channel: 'checkout' },
+    });
+
+    if (!data.checkoutUrl) {
+      return { ok: false, step: 'checkout', message: 'We could not get a payment page. Please try again.' };
+    }
+
+    return {
+      ok: true,
+      step: 'checkout',
+      paymentReference: data.reference,
+      checkoutUrl: data.checkoutUrl,
+    };
+  } catch (err) {
+    if (err instanceof ApiError) return { ok: false, step: 'checkout', message: err.message };
+    return { ok: false, step: 'checkout', message: 'We could not reach the server. Please try again.' };
+  }
+}
+
+/**
+ * Nigeria, in-page: asks the API for a temporary OGateway virtual account
+ * to display. No form input — name, phone and email come from the profile.
  */
 export async function initiateBankTransferAction(_prev: PayState, formData: FormData): Promise<PayState> {
   const reference = String(formData.get('reference') || '');
@@ -143,7 +172,7 @@ export async function initiateBankTransferAction(_prev: PayState, formData: Form
   }
 }
 
-/** Polled by `WaitingStep` and `TransferStep` for charges that settle outside this page (M-Pesa's STK push, a bank transfer). */
+/** Polled by `WaitingStep` and `CheckoutStep` for payments that settle outside this page (M-Pesa's STK push, OGateway's hosted page). */
 export async function checkPaymentStatusAction(paymentReference: string): Promise<PayState> {
   try {
     const { data } = await apiAsUser<Payment>(`/payments/${encodeURIComponent(paymentReference)}`);

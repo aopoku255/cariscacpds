@@ -1,25 +1,24 @@
 'use client';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
-import { Button, Callout } from '@/components/ui';
+import { Button, ButtonLink, Callout } from '@/components/ui';
 import { SubmitButton } from '@/components/forms/SubmitButton';
 import formStyles from '@/components/ui/ui.module.css';
-import { initiateBankTransferAction, checkPaymentStatusAction } from './actions';
-import { emptyPayState, type PayState, type VirtualAccount } from './state';
+import { initiateCheckoutAction, checkPaymentStatusAction } from './actions';
+import { emptyPayState, type PayState } from './state';
 
 const POLL_INTERVAL_MS = 5000;
-// The temporary account lives 25 minutes, so polling stops a little after that.
-const MAX_ATTEMPTS = 330;
+const MAX_ATTEMPTS = 360; // ~30 minutes
 
-/** Step one: nothing to fill in, just ask for an account to pay into. */
-export function TransferStart({
+/** Step one: nothing to fill in, just ask for a payment page. */
+export function CheckoutStart({
   reference, onAdvance, onBack,
 }: {
   reference: string;
   onAdvance: (state: PayState) => void;
   onBack: () => void;
 }) {
-  const [state, formAction] = useActionState(initiateBankTransferAction, emptyPayState);
+  const [state, formAction] = useActionState(initiateCheckoutAction, emptyPayState);
 
   useEffect(() => {
     if (state.ok) onAdvance(state);
@@ -34,22 +33,23 @@ export function TransferStart({
       )}
 
       <p>
-        Pay from your banking app or USSD. We will show you a temporary account
-        number to send the exact amount to.
+        You will pay on our payment partner&apos;s secure page, where you can choose
+        how to pay. It opens in a new tab and this page confirms your registration
+        as soon as the payment arrives.
       </p>
 
-      <SubmitButton pendingLabel="Getting account details…" fullWidth>Get account details</SubmitButton>
+      <SubmitButton pendingLabel="Preparing payment…" fullWidth>Continue to payment</SubmitButton>
       <Button type="button" variant="ghost" onClick={onBack}>Choose another way to pay</Button>
     </form>
   );
 }
 
-/** Step two: show the account, then wait for the transfer to land. */
-export function TransferStep({
-  paymentReference, account, amount, onAdvance,
+/** Step two: link out to the hosted page and wait for the payment to land. */
+export function CheckoutStep({
+  paymentReference, checkoutUrl, amount, onAdvance,
 }: {
   paymentReference: string;
-  account: VirtualAccount;
+  checkoutUrl: string;
   amount: string;
   onAdvance: (state: PayState) => void;
 }) {
@@ -91,12 +91,12 @@ export function TransferStep({
   if (failure || timedOut) {
     return (
       <div className={formStyles.form}>
-        <Callout tone="danger" title="This account has expired">
-          {failure ?? 'We did not receive a transfer in time.'} If you already sent the money, do not
-          send it again — contact us with your registration reference. Otherwise, get a new account.
+        <Callout tone="danger" title="That payment did not go through">
+          {failure ?? 'We did not receive a payment in time.'} If you were charged, do not pay again —
+          contact us with your registration reference. Otherwise you can try again.
         </Callout>
         <Button type="button" variant="secondary" onClick={() => onAdvance(emptyPayState)}>
-          Get a new account
+          Try again
         </Button>
       </div>
     );
@@ -104,16 +104,13 @@ export function TransferStep({
 
   return (
     <div className={formStyles.form}>
-      <dl>
-        <div><dt>Bank</dt><dd><strong>{account.bankName ?? '—'}</strong></dd></div>
-        <div><dt>Account number</dt><dd><strong>{account.accountNumber}</strong></dd></div>
-        <div><dt>Account name</dt><dd><strong>{account.accountName ?? '—'}</strong></dd></div>
-        <div><dt>Amount to send</dt><dd><strong>{amount}</strong></dd></div>
-      </dl>
+      <ButtonLink href={checkoutUrl} target="_blank" rel="noopener noreferrer" fullWidth>
+        Open payment page ({amount})
+      </ButtonLink>
 
-      <Callout tone="info" title="Waiting for your transfer">
-        Send exactly {amount} to this account within 25 minutes. It only works for this payment.
-        This page updates by itself once the money arrives, so please do not close it.
+      <Callout tone="info" title="Waiting for your payment">
+        Complete the payment in the tab that opened. This page updates by itself once it
+        arrives, so please keep it open. If no tab opened, use the button above.
       </Callout>
     </div>
   );
