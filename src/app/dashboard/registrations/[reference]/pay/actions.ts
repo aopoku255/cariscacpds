@@ -9,10 +9,10 @@ import type { Payment, PaymentInitiation } from '@/lib/api/types';
 import type { PayState } from './state';
 
 /**
- * Paystack's charge flows can ask for an OTP, a PIN, a birthday, or nothing
+ * Paystack's charge flows can ask for an OTP, a PIN, or nothing
  * at all before landing on a terminal status — `data.status` says which, and
  * this maps that straight onto which form the page shows next. Anything not
- * specifically recognized (a bank charge left `pending`, M-Pesa's STK push,
+ * specifically recognized (M-Pesa's STK push,
  * or a status Paystack's own docs never actually confirmed for this app)
  * falls back to the waiting/polling screen rather than assuming an OTP
  * prompt is always next — there's nothing for our UI to collect in that
@@ -22,7 +22,6 @@ function stepFor(status: string): PayState['step'] {
   if (status === 'success') return 'done';
   if (status === 'send_pin' || status === 'pin') return 'pin';
   if (status === 'send_otp' || status === 'otp') return 'otp';
-  if (status === 'send_birthday') return 'birthday';
   return 'waiting';
 }
 
@@ -69,8 +68,8 @@ async function submitCode(
   reference: string,
   paymentReference: string,
   value: string,
-  path: 'submit-otp' | 'submit-pin' | 'submit-birthday',
-  field: 'otp' | 'pin' | 'birthday',
+  path: 'submit-otp' | 'submit-pin',
+  field: 'otp' | 'pin',
   fallbackStep: PayState['step'],
 ): Promise<PayState> {
   try {
@@ -114,60 +113,37 @@ export async function submitPinAction(_prev: PayState, formData: FormData): Prom
   return submitCode(reference, paymentReference, pin, 'submit-pin', 'pin', 'pin');
 }
 
-export async function submitBirthdayAction(_prev: PayState, formData: FormData): Promise<PayState> {
-  const reference = String(formData.get('reference') || '');
-  const paymentReference = String(formData.get('paymentReference') || '');
-  const birthday = String(formData.get('birthday') || '').trim();
-
-  if (!birthday) {
-    return { ok: false, step: 'birthday', paymentReference, fieldErrors: { birthday: 'Enter your date of birth.' } };
-  }
-  return submitCode(reference, paymentReference, birthday, 'submit-birthday', 'birthday', 'birthday');
-}
-
 /**
- * Nigeria's bank charge, same shape as `initiateMobileMoneyAction` below —
- * the account is entered in our own form (no redirect), and Paystack's
- * `data.status` says what to collect next (a birthday, an OTP, or nothing
- * while the customer's bank processes it).
+ * Nigeria: asks the API for a temporary OGateway virtual account. There is no
+ * form input — the participant's name, phone and email come from their
+ * profile — so the result is either an account to display or an error.
  */
-export async function initiateBankAction(_prev: PayState, formData: FormData): Promise<PayState> {
+export async function initiateBankTransferAction(_prev: PayState, formData: FormData): Promise<PayState> {
   const reference = String(formData.get('reference') || '');
-  const code = String(formData.get('bankCode') || '');
-  const accountNumber = String(formData.get('accountNumber') || '').trim();
-
-  if (!code || !accountNumber) {
-    return { ok: false, step: 'bank', fieldErrors: { accountNumber: 'Choose a bank and enter the account number.' } };
-  }
 
   try {
     const { data } = await apiAsUser<PaymentInitiation>('/payments/initiate', {
       method: 'POST',
-      body: {
-        registrationReference: reference,
-        channel: 'bank',
-        bank: { code, accountNumber },
-      },
+      body: { registrationReference: reference, channel: 'bank_transfer' },
     });
 
-    if (data.status === 'success') {
-      revalidatePath(`/dashboard/registrations/${reference}`);
-      return { ok: true, step: 'done', paymentReference: data.reference };
+    if (!data.virtualAccount) {
+      return { ok: false, step: 'transfer', message: 'We could not get an account to pay into. Please try again.' };
     }
 
     return {
       ok: true,
-      step: stepFor(data.status),
+      step: 'transfer',
       paymentReference: data.reference,
-      message: data.displayText ?? 'Confirming the payment with your bank.',
+      virtualAccount: data.virtualAccount,
     };
   } catch (err) {
-    if (err instanceof ApiError) return { ok: false, step: 'bank', message: err.message };
-    return { ok: false, step: 'bank', message: 'We could not reach the server. Please try again.' };
+    if (err instanceof ApiError) return { ok: false, step: 'transfer', message: err.message };
+    return { ok: false, step: 'transfer', message: 'We could not reach the server. Please try again.' };
   }
 }
 
-/** Polled by `WaitingStep` for charges that settle on the customer's own device (M-Pesa, a bank app). */
+/** Polled by `WaitingStep` and `TransferStep` for charges that settle outside this page (M-Pesa's STK push, a bank transfer). */
 export async function checkPaymentStatusAction(paymentReference: string): Promise<PayState> {
   try {
     const { data } = await apiAsUser<Payment>(`/payments/${encodeURIComponent(paymentReference)}`);

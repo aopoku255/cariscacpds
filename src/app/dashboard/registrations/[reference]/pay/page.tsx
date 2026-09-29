@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getSession, apiAsUser } from '@/lib/auth/session';
 import { ApiError } from '@/lib/api/client';
-import type { Bank, Registration } from '@/lib/api/types';
+import type { Registration } from '@/lib/api/types';
 import { Card } from '@/components/ui';
 import { money } from '@/lib/format';
 import { ChargeForm } from './ChargeForm';
@@ -16,15 +16,16 @@ export const dynamic = 'force-dynamic';
 type Params = Promise<{ reference: string }>;
 
 /**
- * Which Charge API flow a currency routes through — mirrors
- * `MOBILE_MONEY_CURRENCIES`/`BANK_CURRENCIES` in payment.service.js. Paystack
- * ties channel availability to the transaction currency/market, not a raw
+ * Which payment flow a currency routes through — mirrors
+ * `MOBILE_MONEY_CURRENCIES`/`BANK_TRANSFER_CURRENCIES` in payment.service.js.
+ * Channel availability follows the transaction currency/market, not a raw
  * country field, so currency (itself already resolved from the
  * participant's country at registration time) is the right signal here too.
+ * Nigeria (NGN) pays by bank transfer through OGateway.
  */
-function channelFor(currency: string | undefined): 'mobile_money' | 'bank' | 'card' {
+function channelFor(currency: string | undefined): 'mobile_money' | 'bank_transfer' | 'card' {
   if (currency === 'GHS' || currency === 'KES') return 'mobile_money';
-  if (currency === 'NGN') return 'bank';
+  if (currency === 'NGN') return 'bank_transfer';
   return 'card';
 }
 
@@ -51,16 +52,6 @@ export default async function PayPage({ params }: { params: Params }) {
   const currency = registration.amount?.currency;
   const channel = channelFor(currency);
 
-  let banks: Bank[] = [];
-  if (channel === 'bank') {
-    try {
-      const { data } = await apiAsUser<Bank[]>('/payments/banks');
-      banks = data ?? [];
-    } catch {
-      banks = [];
-    }
-  }
-
   return (
     <div className="shell shell--narrow">
       <div className={styles.page}>
@@ -81,7 +72,12 @@ export default async function PayPage({ params }: { params: Params }) {
           {channel === 'card' ? (
             <CardPayForm reference={reference} />
           ) : (
-            <ChargeForm reference={reference} channel={channel} currency={currency ?? ''} banks={banks} />
+            <ChargeForm
+              reference={reference}
+              channel={channel}
+              currency={currency ?? ''}
+              amount={money(registration.amount)}
+            />
           )}
         </Card>
       </div>

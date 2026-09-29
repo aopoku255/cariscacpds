@@ -1,16 +1,24 @@
 /** Kept out of actions.ts: a "use server" file may only export async functions. */
+export interface VirtualAccount {
+  bankName: string | null;
+  accountName: string | null;
+  accountNumber: string;
+}
+
 export interface PayState {
   ok: boolean;
   /**
-   * Which form to show next. `bank`/`birthday` only apply to the Nigeria
-   * bank-charge flow; `waiting` covers any charge that settles on the
-   * customer's own device (M-Pesa's STK push) or an unrecognized
-   * intermediate status, where there's nothing left for our UI to collect.
+   * Which form to show next. `transfer` is Nigeria's bank transfer: the
+   * account to pay into is shown and the page waits for the transfer to
+   * land. `waiting` covers any charge that settles on the customer's own
+   * device (M-Pesa's STK push) or an unrecognized intermediate status, where
+   * there's nothing left for our UI to collect.
    */
-  step: 'phone' | 'bank' | 'birthday' | 'otp' | 'pin' | 'waiting' | 'done';
+  step: 'phone' | 'transfer' | 'otp' | 'pin' | 'waiting' | 'done';
   paymentReference?: string;
   message?: string;
   fieldErrors?: Record<string, string>;
+  virtualAccount?: VirtualAccount;
 }
 
 export const emptyPayState: PayState = { ok: false, step: 'phone' };

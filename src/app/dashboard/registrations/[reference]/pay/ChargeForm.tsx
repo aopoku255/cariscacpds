@@ -2,29 +2,27 @@
 
 import { useState } from 'react';
 import { Callout } from '@/components/ui';
-import type { Bank } from '@/lib/api/types';
 import { PhoneStep } from './PhoneStep';
-import { BankStep } from './BankStep';
-import { BirthdayStep } from './BirthdayStep';
+import { TransferStart, TransferStep } from './TransferStep';
 import { CodeStep } from './CodeStep';
 import { WaitingStep } from './WaitingStep';
 import { emptyPayState, type PayState } from './state';
 
 /**
- * Owns the whole in-app charge flow — everything except card checkout,
+ * Owns the whole in-app payment flow — everything except card checkout,
  * which redirects to Paystack's own hosted page instead. The first step
- * differs by channel (a phone for mobile money, a bank account for
- * Nigeria); every step after that (birthday, OTP, PIN, or just waiting) is
- * shared, since Paystack's own `data.status` is what decides which one
- * comes next, not which channel started the charge.
+ * differs by channel (a phone for mobile money, a request for a temporary
+ * account for Nigerian bank transfer); after a mobile-money charge starts,
+ * Paystack's own `data.status` decides whether an OTP, a PIN or just
+ * waiting comes next.
  */
 export function ChargeForm({
-  reference, channel, currency, banks,
+  reference, channel, currency, amount,
 }: {
   reference: string;
-  channel: 'mobile_money' | 'bank';
+  channel: 'mobile_money' | 'bank_transfer';
   currency: string;
-  banks?: Bank[];
+  amount: string;
 }) {
   const [view, setView] = useState<PayState>(emptyPayState);
 
@@ -36,8 +34,15 @@ export function ChargeForm({
     );
   }
 
-  if (view.paymentReference && view.step === 'birthday') {
-    return <BirthdayStep reference={reference} paymentReference={view.paymentReference} hint={view.message} onAdvance={setView} />;
+  if (view.paymentReference && view.step === 'transfer' && view.virtualAccount) {
+    return (
+      <TransferStep
+        paymentReference={view.paymentReference}
+        account={view.virtualAccount}
+        amount={amount}
+        onAdvance={setView}
+      />
+    );
   }
 
   if (view.paymentReference && (view.step === 'otp' || view.step === 'pin')) {
@@ -56,8 +61,8 @@ export function ChargeForm({
     return <WaitingStep paymentReference={view.paymentReference} hint={view.message} onAdvance={setView} />;
   }
 
-  if (channel === 'bank') {
-    return <BankStep reference={reference} banks={banks ?? []} onAdvance={setView} />;
+  if (channel === 'bank_transfer') {
+    return <TransferStart reference={reference} onAdvance={setView} />;
   }
 
   return <PhoneStep reference={reference} currency={currency} onAdvance={setView} />;

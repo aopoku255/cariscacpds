@@ -291,12 +291,8 @@ export interface PaymentInitiation {
   status: string;
   displayText: string | null;
   checkoutUrl: string | null;
-}
-
-/** One entry from GET /payments/banks — Nigeria's "Pay with Bank" picker. */
-export interface Bank {
-  name: string;
-  code: string;
+  /** Nigeria only: the temporary OGateway account to transfer into. */
+  virtualAccount?: { bankName: string | null; accountName: string | null; accountNumber: string } | null;
 }
 
 export interface Quote {
