@@ -160,6 +160,18 @@ export async function resetPasswordAction(_prev: FormState, formData: FormData):
   redirect('/login?reset=1');
 }
 
+export async function verifyEmailAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  const token = String(formData.get('token') || '');
+  if (!token) return { ok: false, message: 'This link is incomplete. Request a new one.' };
+
+  try {
+    await apiRequest('/auth/verify-email', { method: 'POST', body: { token } });
+  } catch (err) {
+    return toState(err);
+  }
+  redirect('/login?verified=1');
+}
+
 // --- profile -----------------------------------------------------------------
 export async function updateProfileAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const body: Record<string, unknown> = {};
