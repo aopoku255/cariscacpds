@@ -140,11 +140,14 @@ export function RegisterForm({
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>Anything else</h2>
         <div className="stack stack-5">
-          <Field label="Accessibility or dietary requirements" htmlFor="specialRequirements"
-            hint="Tell us anything we need to arrange for you.">
-            <textarea id="specialRequirements" name="specialRequirements"
-              className={textareaClass} maxLength={1000} />
-          </Field>
+          {/* Only meaningful when someone is physically attending. */}
+          {mode === 'IN_PERSON' && (
+            <Field label="Accessibility or dietary requirements" htmlFor="specialRequirements"
+              hint="Tell us anything we need to arrange for you.">
+              <textarea id="specialRequirements" name="specialRequirements"
+                className={textareaClass} maxLength={1000} />
+            </Field>
+          )}
 
           <Field label="Comments or questions" htmlFor="comments" hint="Optional.">
             <textarea id="comments" name="comments" className={textareaClass} maxLength={5000} />
